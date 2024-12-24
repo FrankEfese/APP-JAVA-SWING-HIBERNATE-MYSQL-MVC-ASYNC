@@ -517,6 +517,21 @@ public class Empresas_Vista extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_btnVerEmpresaActionPerformed
 
+    //METODO PARA CERRAR LAS VENTANAS
+    public void eliminarVentanas(){
+        
+        if(this.verEmpresaVista != null){
+            this.verEmpresaVista.dispose();
+        }
+        
+        if(this.agregarEmpresaVista != null){
+            this.agregarEmpresaVista.dispose();
+        }
+        
+        if(this.actualizarEmpresasVista != null){
+            this.actualizarEmpresasVista.dispose();
+        }
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnActualizarEmpresa;

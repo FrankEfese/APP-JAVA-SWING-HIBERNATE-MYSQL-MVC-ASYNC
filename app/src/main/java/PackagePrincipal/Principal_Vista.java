@@ -30,10 +30,13 @@ public class Principal_Vista extends javax.swing.JFrame {
     private final CardLayout opciones;
 
     //CONSTRUCTOR
-    public Principal_Vista() {
+    public Principal_Vista(Login_Vista vistaLogin) {
         initComponents();
         this.setLocationRelativeTo(null);
         this.opciones = (CardLayout) this.pnlVistas.getLayout();
+        
+        //APLICAMOS LA VISTA LOGIN
+        this.vistaLogin = vistaLogin;
 
         //APLICAMOS LA PESTAÑA INICIO COMO LA PRINCIPAL
         this.vistaInicio = new Inicio_Vista();
@@ -62,11 +65,16 @@ public class Principal_Vista extends javax.swing.JFrame {
         btnAdmin = new javax.swing.JButton();
         pnlVistas = new javax.swing.JPanel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("GESTOR HIBERNATE");
         setBackground(new java.awt.Color(255, 255, 255));
         setMinimumSize(new java.awt.Dimension(1350, 750));
         setPreferredSize(new java.awt.Dimension(1350, 750));
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         jPanel1.setBackground(new java.awt.Color(0, 0, 0));
 
@@ -407,13 +415,14 @@ public class Principal_Vista extends javax.swing.JFrame {
 
     //METODO PARA SALIR DE LA VISTA PRINCIPAL Y VOLVER AL LOGIN
     private void btnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalirActionPerformed
+        eliminarVistas();
+        this.vistaLogin.setVisible(true);
         this.dispose();
-        vistaLogin = new Login_Vista();
-        vistaLogin.setVisible(true);
     }//GEN-LAST:event_btnSalirActionPerformed
 
     //METODO PARA SELECCIONAR LA VISTA SEGUROS
     private void btnSegurosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSegurosActionPerformed
+        eliminarVistas();
         this.vistaSeguro = new Seguros_Vista();
         this.pnlVistas.add(this.vistaSeguro, "vistaSeguro");
         this.opciones.show(this.pnlVistas, "vistaSeguro");
@@ -423,6 +432,7 @@ public class Principal_Vista extends javax.swing.JFrame {
 
     //METODO PARA SELECCIONAR LA VISTA EMPRESAS
     private void btnEmpresasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEmpresasActionPerformed
+        eliminarVistas();
         this.vistaEmpresa = new Empresas_Vista();
         this.pnlVistas.add(this.vistaEmpresa, "vistaEmpresa");
         this.opciones.show(this.pnlVistas, "vistaEmpresa");
@@ -432,6 +442,7 @@ public class Principal_Vista extends javax.swing.JFrame {
 
     //METODO PARA SELECCIONAR LA VISTA EMPLEADOS
     private void btnEmpleadosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEmpleadosActionPerformed
+        eliminarVistas();
         this.vistaEmpleados = new Empleados_Vista();
         this.pnlVistas.add(this.vistaEmpleados, "vistaEmpleados");
         this.opciones.show(this.pnlVistas, "vistaEmpleados");
@@ -441,6 +452,7 @@ public class Principal_Vista extends javax.swing.JFrame {
 
     //METODO PARA SELECCIONAR LA VISTA PRODUCTOS
     private void btnProductosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProductosActionPerformed
+        eliminarVistas();
         this.vistaProductos = new Productos_Vista();
         this.pnlVistas.add(this.vistaProductos, "vistaProductos");
         this.opciones.show(this.pnlVistas, "vistaProductos");
@@ -450,6 +462,7 @@ public class Principal_Vista extends javax.swing.JFrame {
 
     //METODO PARA SELECCIONAR LA VISTA INICIO
     private void btnInicioPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInicioPActionPerformed
+        eliminarVistas();
         this.vistaInicio = new Inicio_Vista();
         this.pnlVistas.add(this.vistaInicio, "vistaInicio");
         this.opciones.show(this.pnlVistas, "vistaInicio");
@@ -470,6 +483,7 @@ public class Principal_Vista extends javax.swing.JFrame {
 
     //METODO PARA SELECCIONAR LA VISTA ADMINISTRADORES
     private void btnAdminActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAdminActionPerformed
+        eliminarVistas();
         this.vistaAdmin = new Administracion_Vista();
         this.pnlVistas.add(this.vistaAdmin, "vistaAdmin");
         this.opciones.show(this.pnlVistas, "vistaAdmin");
@@ -477,6 +491,39 @@ public class Principal_Vista extends javax.swing.JFrame {
         this.repaint();
     }//GEN-LAST:event_btnAdminActionPerformed
 
+    //METODO PARA VOLVER A MOSTRAR EL LOGIN CUANDO SE CIERRE EL MENU PRINCIPAL Y CERRAR TODAS LAS VENTANAS
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        eliminarVistas();
+        this.vistaLogin.setVisible(true);
+        this.dispose(); 
+    }//GEN-LAST:event_formWindowClosing
+
+    //METODO PARA ELIMINAR TODAS LAS VISTAS
+    private void eliminarVistas(){
+        
+        this.pnlVistas.removeAll();
+        
+        if(this.vistaSeguro != null){
+            this.vistaSeguro.eliminarVentanas();
+        }
+        
+        if(this.vistaEmpresa != null){
+            this.vistaEmpresa.eliminarVentanas();
+        }
+        
+        if(this.vistaEmpleados != null){
+            this.vistaEmpleados.eliminarVentanas();
+        }
+        
+        if(this.vistaProductos != null){
+            this.vistaProductos.eliminarVentanas();
+        }
+        
+        if(this.vistaAdmin != null){
+            this.vistaAdmin.eliminarVentanas();
+        }
+    }
+    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdmin;

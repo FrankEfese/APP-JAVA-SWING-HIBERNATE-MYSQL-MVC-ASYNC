@@ -566,6 +566,22 @@ public class Productos_Vista extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_btnActualizarProductoActionPerformed
 
+    //METODO PARA CERRAR LAS VENTANAS
+    public void eliminarVentanas(){
+        
+        if(this.verProductoVista != null){
+            this.verProductoVista.dispose();
+        }
+        
+        if(this.agregarProductoVista != null){
+            this.agregarProductoVista.dispose();
+        }
+        
+        if(this.actualizarProductoVista != null){
+            this.agregarProductoVista.dispose();
+        }
+        
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnActualizarProducto;

@@ -491,6 +491,21 @@ public class Seguros_Vista extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_btnVerSeguroActionPerformed
 
+    //METODO PARA CERRAR LAS VENTANAS
+    public void eliminarVentanas(){
+        
+        if(this.verSeguroVista != null){
+            this.verSeguroVista.dispose();
+        }
+        
+        if(this.agregarSeguroVista != null){
+            this.agregarSeguroVista.dispose();
+        }
+        
+        if(this.actualizarSeguroVista != null){
+            this.actualizarSeguroVista.dispose();
+        }
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnActualizarSeguro;

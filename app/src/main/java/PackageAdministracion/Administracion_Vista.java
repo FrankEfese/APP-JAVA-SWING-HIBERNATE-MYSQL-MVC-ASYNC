@@ -437,7 +437,18 @@ public class Administracion_Vista extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_btnEliminarAdminActionPerformed
 
-
+    //METODO PARA CERRAR LAS VENTANAS
+    public void eliminarVentanas(){
+        
+        if(this.agregarAdminVista != null){
+            this.agregarAdminVista.dispose();
+        }
+        
+        if(this.actualizarAdminVista != null){
+            this.actualizarAdminVista.dispose();
+        }
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnActualizarAdmin;
     private javax.swing.JButton btnAgregarAdmin;

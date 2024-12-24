@@ -163,7 +163,7 @@ public class Login_Vista extends javax.swing.JFrame {
         String contraseña = new String(this.txtContrasenia.getPassword());
         if (this.controladorLogin.comprobarCamposUsuario_C(correo, contraseña) || (correo.equals("admin") && contraseña.equals("admin"))) {
             JOptionPane.showMessageDialog(null, "ADMINISTRADOR CORRECTO", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
-            Principal_Vista vistaPrincipal = new Principal_Vista();
+            Principal_Vista vistaPrincipal = new Principal_Vista(this);
             this.setVisible(false);
             vistaPrincipal.setVisible(true);
             Principal_Vista.correoAdmin = correo;
