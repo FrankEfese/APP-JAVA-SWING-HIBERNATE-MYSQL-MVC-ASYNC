@@ -10,6 +10,7 @@ import javax.persistence.*;
 @Table(name = "seguros")
 public class Seguros_Object implements Serializable {
 
+    // ATRIBUTOS
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id_seguro")
@@ -25,14 +26,15 @@ public class Seguros_Object implements Serializable {
     @Temporal(javax.persistence.TemporalType.DATE)
     private Date f_alta;
 
+    // RELACION MUCHOS A 1 CON EMPRESAS
     @OneToMany(mappedBy = "seguros_id_seguro", cascade = CascadeType.PERSIST)
     private List<Empresas_Object> empresas;
 
-    //CONSTRUCTOR
+    // CONSTRUCTOR
     public Seguros_Object() {
     }
 
-    //CONSTRUCTOR
+    // CONSTRUCTOR
     public Seguros_Object(int id_seguro, String nombre, double precio, Date f_alta) {
         this.id_seguro = id_seguro;
         this.nombre = nombre;
@@ -40,14 +42,14 @@ public class Seguros_Object implements Serializable {
         this.f_alta = f_alta;
     }
 
-    //CONSTRUCTOR
+    // CONSTRUCTOR
     public Seguros_Object(String nombre, double precio, Date f_alta) {
         this.nombre = nombre;
         this.precio = precio;
         this.f_alta = f_alta;
     }
 
-    //GETTERS AND SETTERS
+    // GETTERS AND SETTERS
     public int getId_seguro() {
         return id_seguro;
     }
@@ -88,7 +90,7 @@ public class Seguros_Object implements Serializable {
         this.empresas = empresas;
     }
 
-    //TO STRING
+    // TO STRING
     @Override
     public String toString() {
         return "Seguros_Object{" + "id_seguro=" + id_seguro + ", nombre=" + nombre + ", precio=" + precio + ", f_alta=" + f_alta + ", empresas=" + empresas + '}';

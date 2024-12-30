@@ -3,6 +3,7 @@ package PackageSeguros.PackageOpciones;
 import PackageSeguros.Seguros_Controlador;
 import PackageSeguros.Seguros_Object;
 import PackageSeguros.Seguros_Vista;
+import PackageTools.Validaciones;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.HeadlessException;
@@ -11,20 +12,22 @@ import javax.swing.JOptionPane;
 
 public class Seguros_Agregar_Vista extends javax.swing.JFrame {
 
-    //OBJETO DEL CONTROLADOR DEL SEGUROS
+    // CONTROLADOR-SEGUROS
     private final Seguros_Controlador controladorSeguro = new Seguros_Controlador();
 
-    //OBJETO DE LA VISTA SEGURO PRINCIPAL
+    // VARIABLE VISTA-SEGURO PRINCIPAL
     private final Seguros_Vista vistaS;
 
-    //CONSTRUCTOR
+    // CONSTRUCTOR
     public Seguros_Agregar_Vista(Seguros_Vista vistaSeguro) {
         initComponents();
         this.setLocationRelativeTo(null);
+        
+        // APLICAMOS LA VISTA-SEGURO PRINCIPAL
         this.vistaS = vistaSeguro;
     }
 
-    //COMPONENTES DE LA INTERFAZ
+    // COMPONENTES DE LA INTERFAZ
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -156,43 +159,60 @@ public class Seguros_Agregar_Vista extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    // --- METODO PARA CAMBIAR LA ESTETICA DEL CURSOR Y EL BOTON ---
+    // METODO-ESTETICO
     private void btnAgregarMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnAgregarMouseEntered
         this.btnAgregar.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         this.btnAgregar.setBackground(Color.GRAY);
     }//GEN-LAST:event_btnAgregarMouseEntered
 
+    // METODO-ESTETICO
     private void btnAgregarMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnAgregarMouseExited
         this.btnAgregar.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnAgregarMouseExited
-    // --- METODO PARA CAMBIAR LA ESTETICA DEL CURSOR Y EL BOTON ---
 
-    //METODO PARA AGREGAR EL SEGURO
+    // METODO PARA AGREGAR EL SEGURO
     private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
         try {
+            
             String nombre = this.txtNombre.getText().toUpperCase();
             double precio = Double.parseDouble(this.txtPrecio.getText());
-
-            if (!this.controladorSeguro.nombreExistente(nombre) && (this.controladorSeguro.comprobarCamposSeguro_C(nombre, this.txtPrecio.getText()))) {
-                Date fechaActual = new Date();
-                Seguros_Object seguro = new Seguros_Object(nombre, precio, fechaActual);
-                this.controladorSeguro.guardarSeguro_C(seguro);
-                this.txtNombre.setText("");
-                this.txtPrecio.setText("");
-                this.dispose();
-                this.vistaS.cargarDatosTabla("");
-
-            } else {
-                JOptionPane.showMessageDialog(null, "NOMBRE DE SEGURO YA EXISTENTE O ERROR EN ALGUN CAMPO", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
+            
+            if(Validaciones.validarSeguro(nombre)){
+                
+                this.controladorSeguro.nombreExistente(nombre).thenAccept(existe ->{
+                
+                    if(!existe){
+                        
+                        Date fechaActual = new Date();
+                        Seguros_Object seguro = new Seguros_Object(nombre, precio, fechaActual);
+                        this.controladorSeguro.guardarSeguro_C(seguro).thenRun(() -> {
+                            this.vistaS.cargarDatosTabla("");
+                        }).exceptionally(ex ->{
+                            return null;
+                        });
+                        this.txtNombre.setText("");
+                        this.txtPrecio.setText("");
+                        this.dispose();
+                                                
+                    }else{
+                        JOptionPane.showMessageDialog(null, "NOMBRE DE SEGURO YA EXISTENTE", "AGREGAR SEGURO", JOptionPane.INFORMATION_MESSAGE);
+                    }
+                
+                }).exceptionally(ex ->{
+                    return null;
+                });
+                
+            }else{
+                JOptionPane.showMessageDialog(null, "HAS INTRODUCIDO UN DATO ERRONEO", "AGREGAR SEGURO", JOptionPane.ERROR_MESSAGE);
             }
-
+            
         } catch (HeadlessException | NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "ERROR EN ALGUN CAMPO", "INFORMACION", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "HAS INTRODUCIDO UN DATO ERRONEO", "AGREGAR SEGURO", JOptionPane.ERROR_MESSAGE);
         }
 
     }//GEN-LAST:event_btnAgregarActionPerformed
 
-    //METODO PARA CUANDO SE CIERRA LA VENTANA
+    // METODO PARA CUANDO SE CIERRA LA VENTANA
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
         this.txtNombre.setText("");
         this.txtPrecio.setText("");

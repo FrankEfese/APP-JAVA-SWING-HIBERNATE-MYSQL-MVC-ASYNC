@@ -3,6 +3,7 @@ package PackageSeguros.PackageOpciones;
 import PackageSeguros.Seguros_Controlador;
 import PackageSeguros.Seguros_Object;
 import PackageSeguros.Seguros_Vista;
+import PackageTools.Validaciones;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.HeadlessException;
@@ -10,26 +11,39 @@ import javax.swing.JOptionPane;
 
 public class Seguros_Actualizar_Vista extends javax.swing.JFrame {
 
-    //OBJETO DEL CONTROLADOR DEL SEGUROS
+    // VARIABLE-SEGURO
+    private Seguros_Object seguro;
+    
+    // CONTROLADOR-SEGUROS
     private final Seguros_Controlador controladorSeguro = new Seguros_Controlador();
 
-    //OBJETO DE LA VISTA SEGURO PRINCIPAL
+    // VARIABLE VISTA-SEGURO PRINCIPAL
     private final Seguros_Vista vistaS;
 
-    //OBJETO SEGURO
-    private Seguros_Object seguro;
-
-    //CONSTRUCTOR
+    // CONSTRUCTOR
     public Seguros_Actualizar_Vista(Seguros_Vista vistaSeguro, Seguros_Object seguro) {
         initComponents();
         this.setLocationRelativeTo(null);
+        
+        // APLICAMOS LAS VARIABLES SEGURO
         this.vistaS = vistaSeguro;
         this.seguro = seguro;
-        //CARGAMOS LOS DATOS
-        cargarDatos(this.seguro);
+        
+        // CARGAMOS LOS DATOS
+        cargarDatos();
+    }
+    
+    // GETTER
+    public Seguros_Object getSeguro() {
+        return seguro;
+    }
+        
+    // SETTER
+    public void setSeguro(Seguros_Object seguro) {
+        this.seguro = seguro;
     }
 
-    //COMPONENTES DE LA INTERFAZ
+    // COMPONENTES DE LA INTERFAZ
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -153,44 +167,61 @@ public class Seguros_Actualizar_Vista extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    //METODO PARA CARGAR LOS DATOS
-    public void cargarDatos(Seguros_Object aux) {
-        this.seguro = aux;
+    // METODO PARA CARGAR LOS DATOS
+    public void cargarDatos() {
+        
+        // APLICAMOS LA INFORMACION PRINCIPAL DEL SEGURO
         this.txtNombre.setText(this.seguro.getNombre());
         this.txtPrecio.setText(String.valueOf(this.seguro.getPrecio()));
     }
 
-    // --- METODO PARA CAMBIAR LA ESTETICA DEL CURSOR Y EL BOTON ---
+    // METODO-ESTETICO
     private void btnActualizarMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnActualizarMouseEntered
         this.btnActualizar.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         this.btnActualizar.setBackground(Color.GRAY);
     }//GEN-LAST:event_btnActualizarMouseEntered
 
+    // METODO-ESTETICO
     private void btnActualizarMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnActualizarMouseExited
         this.btnActualizar.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnActualizarMouseExited
-    // --- METODO PARA CAMBIAR LA ESTETICA DEL CURSOR Y EL BOTON ---
 
-    //METODO PARA ACTUALIZAR EL SEGURO
+    // METODO PARA ACTUALIZAR EL SEGURO
     private void btnActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarActionPerformed
         try {
+            
             String nombre = this.txtNombre.getText().toUpperCase();
             double precio = Double.parseDouble(this.txtPrecio.getText());
-
-            if (this.controladorSeguro.comprobarCamposSeguro_C(nombre, this.txtPrecio.getText())
-                    && (!this.controladorSeguro.nombreExistente(nombre) || nombre.equals(this.seguro.getNombre()))) {
-                this.seguro.setNombre(nombre);
-                this.seguro.setPrecio(precio);
-                this.controladorSeguro.actualizarSeguro_C(seguro);
-                this.dispose();
-                this.vistaS.cargarDatosTabla("");
-
-            } else {
-                JOptionPane.showMessageDialog(null, "NOMBRE DE SEGURO YA EXISTENTE", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
+            
+            if(Validaciones.validarSeguro(nombre)){
+                
+                this.controladorSeguro.nombreExistente(nombre).thenAccept(existe ->{
+                
+                    if(!existe || nombre.equals(this.seguro.getNombre())){
+                        
+                        this.seguro.setNombre(nombre);
+                        this.seguro.setPrecio(precio);
+                        this.controladorSeguro.actualizarSeguro_C(seguro).thenRun(() -> {
+                            this.vistaS.actualizarDatos(this.seguro.getId_seguro());
+                        }).exceptionally(ex ->{
+                            return null;
+                        });
+                        this.dispose();
+                                                
+                    }else{
+                        JOptionPane.showMessageDialog(null, "NOMBRE DE SEGURO YA EXISTENTE", "ACTUALIZAR SEGURO", JOptionPane.INFORMATION_MESSAGE);
+                    }
+                
+                }).exceptionally(ex ->{
+                    return null;
+                });
+                
+            }else{
+                JOptionPane.showMessageDialog(null, "HAS INTRODUCIDO UN DATO ERRONEO", "ACTUALIZAR SEGURO", JOptionPane.ERROR_MESSAGE);
             }
 
         } catch (HeadlessException | NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "ERROR EN ALGUN CAMPO", "INFORMACION", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "HAS INTRODUCIDO UN DATO ERRONEO", "ACTUALIZAR SEGURO", JOptionPane.ERROR_MESSAGE);
         }
 
     }//GEN-LAST:event_btnActualizarActionPerformed

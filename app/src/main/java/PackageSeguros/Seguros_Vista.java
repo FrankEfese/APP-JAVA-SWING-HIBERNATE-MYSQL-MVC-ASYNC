@@ -6,31 +6,32 @@ import PackageSeguros.PackageOpciones.Seguros_VerSeguro_Vista;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.text.SimpleDateFormat;
-import java.util.List;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
 public class Seguros_Vista extends javax.swing.JPanel {
 
-    //OBJETO DEL CONTROLADOR DEL SEGUROS
+    // CONTROLADOR-SEGUROS
     private final Seguros_Controlador controladorSeguro = new Seguros_Controlador();
 
-    //MODELO DE LA TABLA
+    // MODELO DE LA TABLA
     private DefaultTableModel modelo;
 
-    //VISTAS DE OPCIONES
+    // VARIABLES VISTAS-OPCIONES
     private Seguros_VerSeguro_Vista verSeguroVista;
     private Seguros_Agregar_Vista agregarSeguroVista;
     private Seguros_Actualizar_Vista actualizarSeguroVista;
 
-    //CONSTRUCTOR
+    // CONSTRUCTOR
     public Seguros_Vista() {
         initComponents();
-        //LLAMAMOS AL METODO PARA CARGAR LOS DATOS EN LA TABLA
+        
+        // LLAMAMOS AL METODO PARA CARGAR LOS DATOS EN LA TABLA
         cargarDatosTabla("");
     }
 
-    //COMPONENTES DE LA INTERFAZ
+    // COMPONENTES DE LA INTERFAZ
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -317,114 +318,135 @@ public class Seguros_Vista extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    //METODO PARA CARGAR LOS DATOS DE LOS SEGUROS EN LA TABLA
+    // METODO PARA CARGAR LOS DATOS DE LOS SEGUROS EN LA TABLA
     public void cargarDatosTabla(String texto) {
 
-        //SE APLICA LAS COLUMNAS
+        // DESHABILITAMOS LA TABLA TEMPORALMENTE
+        this.tablaSeguros.setEnabled(false);
+
+        // SE APLICA LAS COLUMNAS
         String columnas[] = {"ID", "NOMBRE", "PRECIO", "FECHA ALTA"};
         this.modelo = new DefaultTableModel(columnas, 0);
 
-        //FORMATO FECHA
+        // LIMPIAMOS LA TABLA
+        this.modelo.setRowCount(0);
+
+        // FORMATO FECHA
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 
-        //OBTENEMOS LOS SEGUROS
-        List<Seguros_Object> listaSeguros = this.controladorSeguro.obtenerTodosSeguros_C();
+        // OBTENEMOS LOS SEGUROS
+        this.controladorSeguro.obtenerTodosSeguros_C().thenAccept(listaSeguros -> {
 
-        //APLICAMOS EL TOTAL DE SEGUROS
-        this.txtTotalSeguros.setText("* Total de Seguros : " + listaSeguros.size());
+            if (texto.isEmpty()) {
 
-        if (texto.isEmpty()) {
-
-            //CARGAMOS TODOS LOS DATOS           
-            Object arrayObjetos[] = new Object[4];
-            for (Seguros_Object aux : listaSeguros) {
-                arrayObjetos[0] = aux.getId_seguro();
-                arrayObjetos[1] = aux.getNombre();
-                arrayObjetos[2] = String.valueOf(aux.getPrecio() + " €");
-                arrayObjetos[3] = dateFormat.format(aux.getF_alta());
-                this.modelo.addRow(arrayObjetos);
-            }
-
-            this.tablaSeguros.setModel(this.modelo);
-
-        } else {
-
-            //CARGAMOS LOS DATOS QUE CONTENGAN EL TEXTO INTRODUCIDO EN EL FILTRO           
-            Object arrayObjetos[] = new Object[4];
-            for (Seguros_Object aux : listaSeguros) {
-                if (aux.getNombre().contains(texto.toUpperCase())) {
+                // CARGAMOS TODOS LOS DATOS           
+                Object arrayObjetos[] = new Object[4];
+                for (Seguros_Object aux : listaSeguros) {
                     arrayObjetos[0] = aux.getId_seguro();
                     arrayObjetos[1] = aux.getNombre();
-                    arrayObjetos[2] = aux.getPrecio();
+                    arrayObjetos[2] = String.valueOf(aux.getPrecio() + " €");
                     arrayObjetos[3] = dateFormat.format(aux.getF_alta());
                     this.modelo.addRow(arrayObjetos);
                 }
+
+                SwingUtilities.invokeLater(() -> {
+                    this.tablaSeguros.setModel(modelo);
+                    this.tablaSeguros.setEnabled(true);
+                    this.txtTotalSeguros.setText("* Total de Seguros : " + this.tablaSeguros.getRowCount());
+                });
+
+            } else {
+
+                // CARGAMOS LOS DATOS QUE CONTENGAN EL TEXTO INTRODUCIDO EN EL FILTRO           
+                Object arrayObjetos[] = new Object[4];
+                for (Seguros_Object aux : listaSeguros) {
+                    if (aux.getNombre().contains(texto.toUpperCase())) {
+                        arrayObjetos[0] = aux.getId_seguro();
+                        arrayObjetos[1] = aux.getNombre();
+                        arrayObjetos[2] = aux.getPrecio();
+                        arrayObjetos[3] = dateFormat.format(aux.getF_alta());
+                        this.modelo.addRow(arrayObjetos);
+                    }
+                }
+
+                SwingUtilities.invokeLater(() -> {
+                    this.tablaSeguros.setModel(modelo);
+                    this.tablaSeguros.setEnabled(true);
+                    this.txtTotalSeguros.setText("* Total de Seguros : " + this.tablaSeguros.getRowCount());
+                });
             }
 
-            this.tablaSeguros.setModel(this.modelo);
-        }
+        });
     }
 
-    // --- METODOS PARA CAMBIAR LA ESTETICA DEL CURSOR Y EL BOTON ---
+    // METODO-ESTETICO
     private void btnVerSeguroMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnVerSeguroMouseEntered
         this.btnVerSeguro.setBackground(Color.GRAY);
         this.btnVerSeguro.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }//GEN-LAST:event_btnVerSeguroMouseEntered
 
+    // METODO-ESTETICO
     private void btnVerSeguroMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnVerSeguroMouseExited
         this.btnVerSeguro.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnVerSeguroMouseExited
 
+    // METODO-ESTETICO
     private void btnAgregarSeguroMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnAgregarSeguroMouseEntered
         this.btnAgregarSeguro.setBackground(Color.GRAY);
         this.btnAgregarSeguro.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }//GEN-LAST:event_btnAgregarSeguroMouseEntered
 
+    // METODO-ESTETICO
     private void btnAgregarSeguroMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnAgregarSeguroMouseExited
         this.btnAgregarSeguro.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnAgregarSeguroMouseExited
 
+    // METODO-ESTETICO
     private void btnActualizarSeguroMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnActualizarSeguroMouseEntered
         this.btnActualizarSeguro.setBackground(Color.GRAY);
         this.btnActualizarSeguro.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }//GEN-LAST:event_btnActualizarSeguroMouseEntered
 
+    // METODO-ESTETICO
     private void btnActualizarSeguroMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnActualizarSeguroMouseExited
         this.btnActualizarSeguro.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnActualizarSeguroMouseExited
 
+    // METODO-ESTETICO
     private void btnEliminarSeguroMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEliminarSeguroMouseEntered
         this.btnEliminarSeguro.setBackground(Color.GRAY);
         this.btnEliminarSeguro.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }//GEN-LAST:event_btnEliminarSeguroMouseEntered
 
+    // METODO-ESTETICO
     private void btnEliminarSeguroMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEliminarSeguroMouseExited
         this.btnEliminarSeguro.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnEliminarSeguroMouseExited
 
+    // METODO-ESTETICO
     private void btnReinicioMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnReinicioMouseEntered
         this.btnReinicio.setBackground(Color.GRAY);
         this.btnReinicio.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }//GEN-LAST:event_btnReinicioMouseEntered
 
+    // METODO-ESTETICO
     private void btnReinicioMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnReinicioMouseExited
         this.btnReinicio.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnReinicioMouseExited
-    // --- METODOS PARA CAMBIAR LA ESTETICA DEL CURSOR Y EL BOTON ---
 
-    //METODO PARA EL FILTRO DE BUSQUEDA
+    // METODO PARA EL FILTRO DE BUSQUEDA
     private void txtFiltroKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtFiltroKeyReleased
         String texto = this.txtFiltro.getText();
         cargarDatosTabla(texto);
     }//GEN-LAST:event_txtFiltroKeyReleased
 
-    //METODO PARA REINICIAR EL FILTRO Y RECARGAR LA TABLA
+    // METODO PARA REINICIAR EL FILTRO Y RECARGAR LA TABLA
     private void btnReinicioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReinicioActionPerformed
         this.txtFiltro.setText("");
         cargarDatosTabla("");
     }//GEN-LAST:event_btnReinicioActionPerformed
 
-    //METODO PARA ABRIR LA PESTAÑA QUE PERMITE AGREGAR LOS SEGUROS
+    // METODO PARA ABRIR LA PESTAÑA QUE PERMITE AGREGAR LOS SEGUROS
     private void btnAgregarSeguroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarSeguroActionPerformed
         if (this.agregarSeguroVista == null) {
             this.agregarSeguroVista = new Seguros_Agregar_Vista(this);
@@ -434,64 +456,78 @@ public class Seguros_Vista extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_btnAgregarSeguroActionPerformed
 
-    //METODO PARA ABRIR LA PESTAÑA QUE PERMITE ACTUALIZAR LOS SEGUROS
+    // METODO PARA ABRIR LA PESTAÑA QUE PERMITE ACTUALIZAR LOS SEGUROS
     private void btnActualizarSeguroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarSeguroActionPerformed
-
         if (this.tablaSeguros.getSelectedRow() != -1) {
             int idSeguro = (int) this.tablaSeguros.getValueAt(this.tablaSeguros.getSelectedRow(), 0);
-            Seguros_Object seguro = this.controladorSeguro.obtenerSeguro_C(idSeguro);
 
-            if (seguro != null) {
-                if (this.actualizarSeguroVista == null) {
-                    this.actualizarSeguroVista = new Seguros_Actualizar_Vista(this, seguro);
-                    this.actualizarSeguroVista.setVisible(true);
-                } else {
-                    this.actualizarSeguroVista.cargarDatos(seguro);
-                    this.actualizarSeguroVista.setVisible(true);
+            this.controladorSeguro.obtenerSeguro_C(idSeguro).thenAccept(seguro -> {
+
+                if (seguro != null) {
+                    if (this.actualizarSeguroVista == null) {
+                        this.actualizarSeguroVista = new Seguros_Actualizar_Vista(this, seguro);
+                        this.actualizarSeguroVista.setVisible(true);
+                    } else {
+                        this.actualizarSeguroVista.setSeguro(seguro);
+                        this.actualizarSeguroVista.cargarDatos();
+                        this.actualizarSeguroVista.setVisible(true);
+                    }
                 }
-            }
+            });
 
         } else {
-            JOptionPane.showMessageDialog(null, "DEBES SELECCIONAR UNA FILA DE LA TABLA", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "DEBES SELECCIONAR UNA FILA DE LA TABLA", "SEGUROS", JOptionPane.INFORMATION_MESSAGE);
         }
     }//GEN-LAST:event_btnActualizarSeguroActionPerformed
 
-    //METODO PARA ELIMINAR UN SEGURO
+    // METODO PARA ELIMINAR UN SEGURO
     private void btnEliminarSeguroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarSeguroActionPerformed
         if (this.tablaSeguros.getSelectedRow() != -1) {
-            int respuesta = JOptionPane.showConfirmDialog(null, "¿DESEAS ELIMINAR EL SEGURO SELECCIONADO?", "INFORMACION", JOptionPane.YES_NO_OPTION);
+            int respuesta = JOptionPane.showConfirmDialog(null, "¿DESEAS ELIMINAR EL SEGURO SELECCIONADO?", "SEGUROS", JOptionPane.YES_NO_OPTION);
             if (respuesta == JOptionPane.YES_OPTION) {
                 int idSeguro = (int) this.tablaSeguros.getValueAt(this.tablaSeguros.getSelectedRow(), 0);
-                this.controladorSeguro.eliminarSeguro_C(idSeguro);
-                cargarDatosTabla("");
+                this.controladorSeguro.eliminarSeguro_C(idSeguro).thenRun(() -> {
+                    cargarDatosTabla("");
+                }).exceptionally(ex -> {
+                    return null;
+                });
+
+                if (this.verSeguroVista != null && this.verSeguroVista.getIdSeguro() == idSeguro) {
+                    this.verSeguroVista.dispose();
+                }
+
+                if (this.actualizarSeguroVista != null && this.actualizarSeguroVista.getSeguro().getId_seguro() == idSeguro) {
+                    this.actualizarSeguroVista.dispose();
+                }
             }
 
         } else {
-            JOptionPane.showMessageDialog(null, "DEBES SELECCIONAR UNA FILA DE LA TABLA", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "DEBES SELECCIONAR UNA FILA DE LA TABLA", "SEGUROS", JOptionPane.INFORMATION_MESSAGE);
         }
     }//GEN-LAST:event_btnEliminarSeguroActionPerformed
 
-    //METODO PARA VER LOS DATOS DEL SEGURO
+    // METODO PARA VER LOS DATOS DEL SEGURO
     private void btnVerSeguroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerSeguroActionPerformed
         if (this.tablaSeguros.getSelectedRow() != -1) {
-            Seguros_Object seguro = this.controladorSeguro.obtenerSeguro_C((int) this.tablaSeguros.getValueAt(this.tablaSeguros.getSelectedRow(), 0));
-            if (seguro != null) {
+            int idSeguro = (int) this.tablaSeguros.getValueAt(this.tablaSeguros.getSelectedRow(), 0);
+            if (idSeguro > 0) {
 
                 if (this.verSeguroVista == null) {
-                    this.verSeguroVista = new Seguros_VerSeguro_Vista(seguro);
+                    this.verSeguroVista = new Seguros_VerSeguro_Vista(idSeguro);
                     this.verSeguroVista.setVisible(true);
                 } else {
-                    this.verSeguroVista.cargarDatos(seguro);
+                    this.verSeguroVista.setIdSeguro(idSeguro);
+                    this.verSeguroVista.cargarDatos();
                     this.verSeguroVista.setVisible(true);
                 }
             }
 
         } else {
-            JOptionPane.showMessageDialog(null, "DEBES SELECCIONAR UNA FILA DE LA TABLA", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "DEBES SELECCIONAR UNA FILA DE LA TABLA", "SEGUROS", JOptionPane.INFORMATION_MESSAGE);
         }
     }//GEN-LAST:event_btnVerSeguroActionPerformed
 
-    //METODO PARA CERRAR LAS VENTANAS
+    // METODO PARA CERRAR LAS VENTANAS
     public void eliminarVentanas(){
         
         if(this.verSeguroVista != null){
@@ -504,6 +540,17 @@ public class Seguros_Vista extends javax.swing.JPanel {
         
         if(this.actualizarSeguroVista != null){
             this.actualizarSeguroVista.dispose();
+        }
+    }
+    
+    // METODO PARA ACTUALIZAR DATOS VENTANA-PRINCIPAL Y VENTANA VER-SEGURO
+    public void actualizarDatos(int idSeguro){
+        
+        cargarDatosTabla("");
+        
+        if(this.verSeguroVista != null && this.verSeguroVista.getIdSeguro() == idSeguro){
+            this.verSeguroVista.setIdSeguro(idSeguro);
+            this.verSeguroVista.cargarDatos();
         }
     }
 

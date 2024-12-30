@@ -13,22 +13,22 @@ public class Seguros_Modelo {
 
     private final SessionFactory sessionFactory;
 
-    //CONSTRUCTOR
+    // CONSTRUCTOR
     public Seguros_Modelo(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
 
-    //METODO PARA OBTENER TODOS LOS SEGUROS (MODELO)
+    // METODO PARA OBTENER TODOS LOS SEGUROS (MODELO)
     public List<Seguros_Object> obtenerTodosSeguros_M() {
         try (Session session = sessionFactory.openSession()) {
             return session.createQuery("FROM Seguros_Object", Seguros_Object.class).list();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "ERROR AL OBTENER LOS SEGUROS", "INFORMACION", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "ERROR AL OBTENER LOS SEGUROS", "SEGUROS-M", JOptionPane.ERROR_MESSAGE);
             return new ArrayList<>();
         }
     }
 
-    //METODO PARA GUARDAR EL SEGURO (MODELO)
+    // METODO PARA GUARDAR EL SEGURO (MODELO)
     public void guardarSeguro_M(Seguros_Object seguro) {
 
         try {
@@ -37,53 +37,53 @@ public class Seguros_Modelo {
             Transaction transaccion = sesion.beginTransaction();
 
             sesion.save(seguro);
-            JOptionPane.showMessageDialog(null, "SEGURO AGREGADO", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "SEGURO AGREGADO", "SEGUROS-M", JOptionPane.INFORMATION_MESSAGE);
             transaccion.commit();
 
         } catch (HibernateException e) {
-            JOptionPane.showMessageDialog(null, "ERROR AL AGREGAR EL SEGURO", "INFORMACION", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "ERROR AL AGREGAR EL SEGURO", "SEGUROS-M", JOptionPane.ERROR_MESSAGE);
         }
 
     }
 
-    //METODO PARA OBTENER UN SEGURO (MODELO)
+    // METODO PARA OBTENER UN SEGURO (MODELO)
     public Seguros_Object obtenerSeguro_M(int idSeguro) {
         try (Session session = sessionFactory.openSession()) {
             return session.get(Seguros_Object.class, idSeguro);
         } catch (HibernateException e) {
-            JOptionPane.showMessageDialog(null, "ERROR AL OBTENER EL SEGURO", "INFORMACION", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "ERROR AL OBTENER EL SEGURO", "SEGUROS-M", JOptionPane.ERROR_MESSAGE);
             return null;
         }
     }
 
-    //METODO PARA ACTUALIZAR EL SEGURO (MODELO)
+    // METODO PARA ACTUALIZAR EL SEGURO (MODELO)
     public void actualizarSeguro_M(Seguros_Object seguro) {
         try (Session session = sessionFactory.openSession()) {
             Transaction transaction = session.beginTransaction();
             session.update(seguro);
-            JOptionPane.showMessageDialog(null, "SEGURO ACTUALIZADO", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "SEGURO ACTUALIZADO", "SEGUROS-M", JOptionPane.INFORMATION_MESSAGE);
             transaction.commit();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "ERROR AL ACTUALIZAR EL SEGURO", "INFORMACION", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "ERROR AL ACTUALIZAR EL SEGURO", "SEGUROS-M", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    //METODO PARA ELIMINAR UN SEGURO (MODELO)
+    // METODO PARA ELIMINAR UN SEGURO (MODELO)
     public void eliminarSeguro_M(int idSeguro) {
         try (Session session = sessionFactory.openSession()) {
             Transaction transaction = session.beginTransaction();
             Seguros_Object seguro = session.get(Seguros_Object.class, idSeguro);
             if (seguro != null) {
                 session.delete(seguro);
-                JOptionPane.showMessageDialog(null, "SEGURO ELIMINADO CORRECTAMENTE", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, "SEGURO ELIMINADO CORRECTAMENTE", "SEGUROS-M", JOptionPane.INFORMATION_MESSAGE);
             }
             transaction.commit();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "ERROR AL ELIMINAR EL SEGURO", "INFORMACION", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "ERROR AL ELIMINAR EL SEGURO", "SEGUROS-M", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    //METODO PARA OBTENER LAS EMPRESAS ASEGURADAS (MODELO)
+    // METODO PARA OBTENER LAS EMPRESAS ASEGURADAS (MODELO)
     public List<Empresas_Object> obtenerEmpresasPorSeguro_M(int idSeguro) {
         try (Session session = sessionFactory.openSession()) {
             String jpql = "SELECT em FROM Empresas_Object em WHERE em.seguros_id_seguro.id_seguro = :id_Seguro";
@@ -91,7 +91,7 @@ public class Seguros_Modelo {
                     .setParameter("id_Seguro", idSeguro)
                     .getResultList();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "ERROR AL OBTENER LAS EMPRESAS ASEGURADAS", "INFORMACION", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "ERROR AL OBTENER LAS EMPRESAS ASEGURADAS", "SEGUROS-M", JOptionPane.ERROR_MESSAGE);
             return new ArrayList<>();
         }
     }
