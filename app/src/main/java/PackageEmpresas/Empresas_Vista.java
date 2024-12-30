@@ -354,7 +354,7 @@ public class Empresas_Vista extends javax.swing.JPanel {
                     if (aux.getSeguros_id_seguro() == null) {
                         arrayObjetos[4] = "SIN SEGURO";
                     } else {
-                        arrayObjetos[4] = aux.getSeguros_id_seguro().getNombre();
+                        arrayObjetos[4] = this.controladorSeguros.obtenerSeguro_C(aux.getSeguros_id_seguro().getId_seguro()).join().getNombre();
                     }
                     arrayObjetos[5] = dateFormat.format(aux.getF_alta());
                     this.modelo.addRow(arrayObjetos);
@@ -379,7 +379,7 @@ public class Empresas_Vista extends javax.swing.JPanel {
                         if (aux.getSeguros_id_seguro() == null) {
                             arrayObjetos[4] = "SIN SEGURO";
                         } else {
-                            arrayObjetos[4] = aux.getSeguros_id_seguro().getNombre();
+                            arrayObjetos[4] = this.controladorSeguros.obtenerSeguro_C(aux.getSeguros_id_seguro().getId_seguro()).join().getNombre();
                         }
                         arrayObjetos[5] = dateFormat.format(aux.getF_alta());
                         this.modelo.addRow(arrayObjetos);

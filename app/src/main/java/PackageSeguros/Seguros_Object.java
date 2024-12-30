@@ -26,7 +26,7 @@ public class Seguros_Object implements Serializable {
     @Temporal(javax.persistence.TemporalType.DATE)
     private Date f_alta;
 
-    // RELACION MUCHOS A 1 CON EMPRESAS
+    // RELACION 1 A MUCHOS CON EMPRESAS
     @OneToMany(mappedBy = "seguros_id_seguro", cascade = CascadeType.PERSIST)
     private List<Empresas_Object> empresas;
 

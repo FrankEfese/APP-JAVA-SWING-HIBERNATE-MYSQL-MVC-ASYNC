@@ -245,7 +245,7 @@ public class Productos_Actualizar_Vista extends javax.swing.JFrame {
 
         jLabel6.setBackground(new java.awt.Color(255, 255, 255));
         jLabel6.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
-        jLabel6.setText("TELEFONO :");
+        jLabel6.setText("CATEGORIA :");
 
         spnStock.setFont(new java.awt.Font("Bahnschrift", 1, 18)); // NOI18N
         spnStock.setModel(new javax.swing.SpinnerNumberModel(1, 1, 999, 1));

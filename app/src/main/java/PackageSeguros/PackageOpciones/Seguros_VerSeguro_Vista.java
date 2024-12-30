@@ -55,18 +55,24 @@ public class Seguros_VerSeguro_Vista extends javax.swing.JFrame {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
                 this.txtF_Alta.setText("FECHA ALTA : " + dateFormat.format(seguro.getF_alta()));
 
-                // APLICAMOS LAS EMPRESAS ASEGURADAS
-                this.txtTotalEmpresas.setText("* Total de Empresas Aseguradas : " + seguro.getEmpresas().size());
+                this.controladorSeguro.obtenerEmpresasPorSeguro_C(this.idSeguro).thenAccept(listaEmpresas -> {
+                
+                    Object datos[] = new Object[3];
+                    for (Empresas_Object aux : listaEmpresas) {
+                        datos[0] = aux.getId_empresarial();
+                        datos[1] = aux.getNombre();
+                        datos[2] = aux.getCiudad();
+                        this.modelo.addRow(datos);
+                    }
 
-                Object datos[] = new Object[3];
-                for (Empresas_Object aux : seguro.getEmpresas()) {
-                    datos[0] = aux.getId_empresarial();
-                    datos[1] = aux.getNombre();
-                    datos[2] = aux.getCiudad();
-                    this.modelo.addRow(datos);
-                }
-
-                this.tablaEmpresas.setModel(this.modelo);
+                    this.tablaEmpresas.setModel(this.modelo);
+                    
+                    // APLICAMOS LAS EMPRESAS ASEGURADAS
+                    this.txtTotalEmpresas.setText("* Total de Empresas Aseguradas : " + this.tablaEmpresas.getRowCount());
+                    
+                }).exceptionally(ex ->{       
+                    return null;
+                });               
 
             }
                     

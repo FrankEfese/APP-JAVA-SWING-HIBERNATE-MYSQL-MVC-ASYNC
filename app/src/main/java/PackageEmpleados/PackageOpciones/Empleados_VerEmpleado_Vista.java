@@ -1,6 +1,7 @@
 package PackageEmpleados.PackageOpciones;
 
 import PackageEmpleados.Empleados_Controlador;
+import PackageEmpresas.Empresas_Controlador;
 import java.text.SimpleDateFormat;
 
 public class Empleados_VerEmpleado_Vista extends javax.swing.JFrame {
@@ -8,8 +9,9 @@ public class Empleados_VerEmpleado_Vista extends javax.swing.JFrame {
     // VARIABLE ID-EMPLEADO
     private int idEmpleado;
     
-    // CONTROLADOR-EMPLEADOS
+    // CONTROLADOR DE EMPLEADOS Y EMPRESAS
     private final Empleados_Controlador controladorEmpleado = new Empleados_Controlador();
+    private final Empresas_Controlador controladorEmpresa = new Empresas_Controlador();
 
     // CONSTRUCTOR
     public Empleados_VerEmpleado_Vista(int idEmpleado) {
@@ -40,14 +42,14 @@ public class Empleados_VerEmpleado_Vista extends javax.swing.JFrame {
             
             if(empleado != null){
                 
-                //APLICAMOS LA INFORMACION PRINCIPAL DEL EMPLEADO
+                // APLICAMOS LA INFORMACION PRINCIPAL DEL EMPLEADO
                 this.txtDni.setText("DNI : " + empleado.getDni());
                 this.txtNombre.setText("NOMBRE : " + empleado.getNombre());
                 this.txtEdad.setText("EDAD : " + empleado.getEdad());
                 this.txtTelefono.setText("TELEFONO : " + empleado.getTelefono());
 
                 if (empleado.getEmpresas_id_empresa() != null) {
-                    this.txtEmpresa.setText("EMPRESA : " + empleado.getEmpresas_id_empresa().getNombre());
+                    this.txtEmpresa.setText("EMPRESA : " + this.controladorEmpresa.obtenerEmpresa_C(empleado.getEmpresas_id_empresa().getId_empresa()).join().getNombre());
                 } else {
                     this.txtEmpresa.setText("EMPRESA : SIN TRABAJO");
                 }

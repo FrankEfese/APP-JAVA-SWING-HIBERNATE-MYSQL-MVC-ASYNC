@@ -3,8 +3,8 @@ package PackageEmpresas.PackageOpciones;
 import PackageEmpleados.Empleados_Object;
 import PackageEmpresas.Empresas_Controlador;
 import PackageProductos.Productos_Object;
+import PackageSeguros.Seguros_Controlador;
 import java.text.SimpleDateFormat;
-import java.util.List;
 import javax.swing.table.DefaultTableModel;
 
 public class Empresas_VerEmpresa_Vista extends javax.swing.JFrame {
@@ -12,8 +12,9 @@ public class Empresas_VerEmpresa_Vista extends javax.swing.JFrame {
     // VARIABLE ID-EMPRESA
     private int idEmpresa;
     
-    // CONTROLADOR-EMPRESA
+    // CONTROLADOR DE EMPRESA Y SEGURO
     private final Empresas_Controlador controladorEmpresa = new Empresas_Controlador();
+    private final Seguros_Controlador controladorSeguro = new Seguros_Controlador();
 
     // MODELOS DE LA TABLA EMPLEADOS Y PRODUCTOS
     private DefaultTableModel modeloE;
@@ -61,7 +62,7 @@ public class Empresas_VerEmpresa_Vista extends javax.swing.JFrame {
                 this.txtCiudad.setText("CIUDAD : " + empresa.getCiudad());
 
                 if(empresa.getSeguros_id_seguro() != null){
-                    this.txtSeguro.setText("SEGURO : " + empresa.getSeguros_id_seguro().getNombre());
+                    this.txtSeguro.setText("SEGURO : " + this.controladorSeguro.obtenerSeguro_C(empresa.getSeguros_id_seguro().getId_seguro()).join().getNombre());
                 }else{
                    this.txtSeguro.setText("SEGURO : SIN SEGURO"); 
                 }
@@ -70,31 +71,39 @@ public class Empresas_VerEmpresa_Vista extends javax.swing.JFrame {
                 this.txtF_Alta.setText("FECHA ALTA : " + dateFormat.format(empresa.getF_alta()));
 
                 // APLICAMOS LOS EMPLEADOS
-                List<Empleados_Object> empleados = empresa.getEmpleados();
-                this.txtTotalEmpleados.setText("* Total de Empleados : " + empleados.size());
+                this.controladorEmpresa.obtenerEmpleadosDeEmpresa_C(this.idEmpresa).thenAccept(empleados -> {
+                
+                    Object datos[] = new Object[2];
+                    for (Empleados_Object aux : empleados) {
+                        datos[0] = aux.getDni();
+                        datos[1] = aux.getNombre();
+                        this.modeloE.addRow(datos);
+                    }
 
-                Object datos[] = new Object[2];
-                for (Empleados_Object aux : empleados) {
-                    datos[0] = aux.getDni();
-                    datos[1] = aux.getNombre();
-                    this.modeloE.addRow(datos);
-                }
-
-                this.tablaEmpleados.setModel(this.modeloE);
+                    this.tablaEmpleados.setModel(this.modeloE);
+                    this.txtTotalEmpleados.setText("* Total de Empleados : " +this.tablaEmpleados.getRowCount());
+                
+                }).exceptionally(ex ->{       
+                    return null;
+                });               
 
                 // APLICAMOS LOS PRODUCTOS
-                List<Productos_Object> productos = empresa.getProductos();
-                this.txtTotalProductos.setText("* Total de Productos : " + productos.size());
+                this.controladorEmpresa.obtenerProductosDeEmpresa_C(this.idEmpresa).thenAccept(productos -> {
+                
+                    Object datos2[] = new Object[2];
+                    for (Productos_Object aux : productos) {
+                        datos2[0] = aux.getIdentificador();
+                        datos2[1] = aux.getNombre();
+                        this.modeloP.addRow(datos2);
+                    }
 
-                Object datos2[] = new Object[2];
-                for (Productos_Object aux : productos) {
-                    datos2[0] = aux.getIdentificador();
-                    datos2[1] = aux.getNombre();
-                    this.modeloP.addRow(datos2);
-                }
-
-                this.tablaProductos.setModel(this.modeloP);
-
+                    this.tablaProductos.setModel(this.modeloP);
+                    this.txtTotalProductos.setText("* Total de Productos : " + this.tablaProductos.getRowCount());
+                    
+                }).exceptionally(ex ->{       
+                    return null;
+                });
+                
             }
                     
         }).exceptionally(ex ->{       

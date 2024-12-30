@@ -35,7 +35,7 @@ public class Productos_Object implements Serializable{
     @Temporal(javax.persistence.TemporalType.DATE)
     private Date f_alta;
     
-    // RELACION 1 A MUCHOS CON EMPRESAS
+    // RELACION MUCHOS A 1 CON EMPRESAS
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "empresas_id_empresa_p", nullable = true)
     private Empresas_Object empresas_id_empresa_p;

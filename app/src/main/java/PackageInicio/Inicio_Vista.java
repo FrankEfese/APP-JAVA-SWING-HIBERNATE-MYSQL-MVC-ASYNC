@@ -9,18 +9,18 @@ import PackageSeguros.*;
 
 public class Inicio_Vista extends javax.swing.JPanel {
 
-    //OBJETO DEL CONTROLADOR DE SEGUROS , EMPRESA , EMPLEADO , PRODUCTO y ADMINISTRADOR
+    // CONTROLADOR DE SEGUROS , EMPRESAS , EMPLEADOS , PRODUCTOS y ADMINISTRADORES
     private final Seguros_Controlador controladorSeguro = new Seguros_Controlador();
     private final Empresas_Controlador controladorEmpresa = new Empresas_Controlador();
     private final Empleados_Controlador controladorEmpleado = new Empleados_Controlador();
     private final Productos_Controlador controladorProducto = new Productos_Controlador();
     private final Administracion_Controlador controladorAdmin = new Administracion_Controlador();
 
-
-    //CONSTRUCTOR
+    // CONSTRUCTOR
     public Inicio_Vista() {
         initComponents();
-        //LLAMAMOS AL METODO PARA CARGAR LOS DATOS
+        
+        // LLAMAMOS AL METODO PARA CARGAR LOS DATOS
         cargarDatosTabla();
     }
 
@@ -157,16 +157,29 @@ public class Inicio_Vista extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    //METODO PARA CARGAR LOS DATOS
+    // METODO PARA CARGAR LOS DATOS
     public void cargarDatosTabla() {
         
-        //APLICAMOS EL TOTAL DE SEGUROS, EMPRESA , EMPLEADO , PRODUCTO y ADMINISTRADORES
-        this.lblSeguros.setText("TOTAL DE SEGUROS : " + this.controladorSeguro.obtenerTodosSeguros_C().size());
-        this.lblEmpresas.setText("TOTAL DE EMPRESAS : " + this.controladorEmpresa.obtenerTodasEmpresas_C().size());
-        this.lblEmpleados.setText("TOTAL DE EMPLEADOS : " + this.controladorEmpleado.obtenerTodosEmpleados_C().size());
-        this.lblProductos.setText("TOTAL DE PRODUCTOS : " + this.controladorProducto.obtenerTodosProductos_C().size());
-        this.lblAdmin.setText("TOTAL DE ADMINISTRADORES : " + this.controladorAdmin.obtenerTodosLogin_C().size());
-
+        // APLICAMOS EL TOTAL DE SEGUROS, EMPRESAS , EMPLEADOS , PRODUCTOS y ADMINISTRADORES
+        this.controladorSeguro.totalSeguros_C().thenAccept(totalSeguros -> {
+            this.lblSeguros.setText("TOTAL DE SEGUROS : " + totalSeguros);
+        });
+        
+        this.controladorEmpresa.totalEmpresas().thenAccept(totalEmpresas -> {
+            this.lblEmpresas.setText("TOTAL DE EMPRESAS : " + totalEmpresas);
+        });
+        
+        this.controladorEmpleado.totalEmpleados().thenAccept(totalEmpleados -> {
+            this.lblEmpleados.setText("TOTAL DE EMPLEADOS : " + totalEmpleados);
+        });
+        
+        this.controladorProducto.totalProductos().thenAccept(totalProductos -> {
+            this.lblProductos.setText("TOTAL DE PRODUCTOS : " + totalProductos);
+        });
+        
+        this.controladorAdmin.totalAdmin().thenAccept(totalAdmins -> {
+            this.lblAdmin.setText("TOTAL DE ADMINISTRADORES : " + totalAdmins);
+        });
     }
 
 

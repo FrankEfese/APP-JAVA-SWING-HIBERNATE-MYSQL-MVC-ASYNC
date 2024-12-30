@@ -380,7 +380,7 @@ public class Productos_Vista extends javax.swing.JPanel {
                     arrayObjetos[3] = String.valueOf(aux.getPrecio() + " €");
                     arrayObjetos[4] = aux.getCategoria();
                     arrayObjetos[5] = aux.getStock();
-                    arrayObjetos[6] = aux.getEmpresas_id_empresa_p().getNombre();
+                    arrayObjetos[6] = this.controladorEmpresas.obtenerEmpresa_C(aux.getEmpresas_id_empresa_p().getId_empresa()).join().getNombre();
                     arrayObjetos[7] = dateFormat.format(aux.getF_alta());
                     this.modelo.addRow(arrayObjetos);
                 }
@@ -404,7 +404,7 @@ public class Productos_Vista extends javax.swing.JPanel {
                             arrayObjetos[3] = String.valueOf(aux.getPrecio() + " €");
                             arrayObjetos[4] = aux.getCategoria();
                             arrayObjetos[5] = aux.getStock();
-                            arrayObjetos[6] = aux.getEmpresas_id_empresa_p().getNombre();
+                            arrayObjetos[6] = this.controladorEmpresas.obtenerEmpresa_C(aux.getEmpresas_id_empresa_p().getId_empresa()).join().getNombre();
                             arrayObjetos[7] = dateFormat.format(aux.getF_alta());
                             this.modelo.addRow(arrayObjetos);
 
@@ -419,7 +419,7 @@ public class Productos_Vista extends javax.swing.JPanel {
                             arrayObjetos[3] = aux.getPrecio();
                             arrayObjetos[4] = aux.getCategoria();
                             arrayObjetos[5] = aux.getStock();
-                            arrayObjetos[6] = aux.getEmpresas_id_empresa_p().getNombre();
+                            arrayObjetos[6] = this.controladorEmpresas.obtenerEmpresa_C(aux.getEmpresas_id_empresa_p().getId_empresa()).join().getNombre();
                             arrayObjetos[7] = dateFormat.format(aux.getF_alta());
                             this.modelo.addRow(arrayObjetos);
 

@@ -355,7 +355,7 @@ public class Empleados_Vista extends javax.swing.JPanel {
                     if (aux.getEmpresas_id_empresa() == null) {
                         arrayObjetos[5] = "SIN TRABAJO";
                     } else {
-                        arrayObjetos[5] = aux.getEmpresas_id_empresa().getNombre();
+                        arrayObjetos[5] = this.controladorEmpresas.obtenerEmpresa_C(aux.getEmpresas_id_empresa().getId_empresa()).join().getNombre();
                     }
                     arrayObjetos[6] = dateFormat.format(aux.getF_alta());
                     this.modelo.addRow(arrayObjetos);
@@ -381,7 +381,7 @@ public class Empleados_Vista extends javax.swing.JPanel {
                         if (aux.getEmpresas_id_empresa() == null) {
                             arrayObjetos[5] = "SIN TRABAJO";
                         } else {
-                            arrayObjetos[5] = aux.getEmpresas_id_empresa().getNombre();
+                            arrayObjetos[5] = this.controladorEmpresas.obtenerEmpresa_C(aux.getEmpresas_id_empresa().getId_empresa()).join().getNombre();
                         }
                         arrayObjetos[6] = dateFormat.format(aux.getF_alta());
                         this.modelo.addRow(arrayObjetos);
@@ -465,7 +465,7 @@ public class Empleados_Vista extends javax.swing.JPanel {
         cargarDatosTabla("");
     }//GEN-LAST:event_btnReinicioActionPerformed
     
-    //METODO PARA ELIMINAR A UN EMPLEADO
+    // METODO PARA ELIMINAR A UN EMPLEADO
     private void btnEliminarEmpleadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarEmpleadoActionPerformed
         if (this.tablaEmpleados.getSelectedRow() != -1) {
             int respuesta = JOptionPane.showConfirmDialog(null, "¿DESEAS ELIMINAR EL EMPLEADO SELECCIONADO?", "EMPLEADOS", JOptionPane.YES_NO_OPTION);
@@ -491,7 +491,7 @@ public class Empleados_Vista extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_btnEliminarEmpleadoActionPerformed
 
-    //METODO PARA ABRIR LA PESTAÑA QUE PERMITE AGREGAR LOS EMPLEADOS
+    // METODO PARA ABRIR LA PESTAÑA QUE PERMITE AGREGAR LOS EMPLEADOS
     private void btnAgregarEmpleadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarEmpleadoActionPerformed
         this.controladorEmpresas.totalEmpresas().thenAccept(total -> {
             if (total > 0) {
@@ -509,7 +509,7 @@ public class Empleados_Vista extends javax.swing.JPanel {
         });
     }//GEN-LAST:event_btnAgregarEmpleadoActionPerformed
 
-    //METODO PARA ABRIR LA PESTAÑA QUE PERMITE VER LOS DATOS DE LOS EMPLEADOS
+    // METODO PARA ABRIR LA PESTAÑA QUE PERMITE VER LOS DATOS DE LOS EMPLEADOS
     private void btnVerEmpleadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerEmpleadoActionPerformed
         if (this.tablaEmpleados.getSelectedRow() != -1) {
             int idEmpleado = (int) this.tablaEmpleados.getValueAt(this.tablaEmpleados.getSelectedRow(), 0);
@@ -530,7 +530,7 @@ public class Empleados_Vista extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_btnVerEmpleadoActionPerformed
 
-    //METODO PARA ABRIR LA PESTAÑA QUE PERMITE ACTUALIZAR LOS DATOS DEL EMPLEADO
+    // METODO PARA ABRIR LA PESTAÑA QUE PERMITE ACTUALIZAR LOS DATOS DEL EMPLEADO
     private void btnActualizarEmpleadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarEmpleadoActionPerformed
         if (this.tablaEmpleados.getSelectedRow() != -1) {
             int idEmpleado = (int) this.tablaEmpleados.getValueAt(this.tablaEmpleados.getSelectedRow(), 0);

@@ -1,5 +1,6 @@
 package PackageProductos.PackageOpciones;
 
+import PackageEmpresas.Empresas_Controlador;
 import PackageProductos.Productos_Controlador;
 import java.text.SimpleDateFormat;
 
@@ -8,8 +9,9 @@ public class Productos_VerProducto_Vista extends javax.swing.JFrame {
     // VARIABLE ID-PRODUCTO
     private int idProducto;
     
-    // CONTROLADOR-PRODUCTOS
+    // CONTROLADOR DE PRODUCTOS Y EMPRESAS
     private final Productos_Controlador controladorProductos = new Productos_Controlador();
+    private final Empresas_Controlador controladorEmpresas = new Empresas_Controlador();
 
     // CONSTRUCTOR
     public Productos_VerProducto_Vista(int idProducto) {
@@ -46,7 +48,7 @@ public class Productos_VerProducto_Vista extends javax.swing.JFrame {
                 this.txtPrecio.setText("PRECIO : " + producto.getPrecio() + " €");
                 this.txtCategoria.setText("CATEGORIA : " + producto.getCategoria());
                 this.txtStock.setText("STOCK : " + producto.getStock());
-                this.txtEmpresa.setText("EMPRESA : " + producto.getEmpresas_id_empresa_p().getNombre());
+                this.txtEmpresa.setText("EMPRESA : " + this.controladorEmpresas.obtenerEmpresa_C(producto.getEmpresas_id_empresa_p().getId_empresa()).join().getNombre());
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
                 this.txtF_Alta.setText("FECHA ALTA : " + dateFormat.format(producto.getF_alta()));
                 

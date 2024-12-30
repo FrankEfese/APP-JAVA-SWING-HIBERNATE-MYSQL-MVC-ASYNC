@@ -395,13 +395,13 @@ public class Administracion_Vista extends javax.swing.JPanel {
         this.btnReinicio.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnReinicioMouseExited
 
-    //METODO PARA EL FILTRO DE BUSQUEDA
+    // METODO PARA EL FILTRO DE BUSQUEDA
     private void txtFiltroKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtFiltroKeyReleased
         String texto = this.txtFiltro.getText();
         cargarDatosTabla(texto);
     }//GEN-LAST:event_txtFiltroKeyReleased
 
-    //METODO PARA REINICIAR EL FILTRO Y RECARGAR LA TABLA
+    // METODO PARA REINICIAR EL FILTRO Y RECARGAR LA TABLA
     private void btnReinicioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReinicioActionPerformed
         this.txtFiltro.setText("");
         cargarDatosTabla("");

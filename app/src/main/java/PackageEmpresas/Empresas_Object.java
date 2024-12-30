@@ -31,16 +31,16 @@ public class Empresas_Object implements Serializable {
     @Temporal(javax.persistence.TemporalType.DATE)
     private Date f_alta;
 
-    // RELACION 1 A MUCHOS CON SEGUROS
+    // RELACION MUCHOS A 1 CON SEGUROS
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "seguros_id_seguro", nullable = true)
     private Seguros_Object seguros_id_seguro;
     
-    // RELACION MUCHOS A 1 CON EMPLEADOS
+    // RELACION 1 A MUCHOS CON EMPLEADOS
     @OneToMany(mappedBy = "empresas_id_empresa", cascade = CascadeType.PERSIST)
     private List<Empleados_Object> empleados;
     
-    // RELACION MUCHOS A 1 CON PRODUCTOS
+    // RELACION 1 A MUCHOS CON PRODUCTOS
     @OneToMany(mappedBy = "empresas_id_empresa_p", cascade = CascadeType.REMOVE)
     private List<Productos_Object> productos;
 
