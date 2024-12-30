@@ -1,92 +1,131 @@
 package PackageProductos.PackageOpciones;
 
-
 import PackageEmpresas.Empresas_Controlador;
 import PackageEmpresas.Empresas_Object;
 import PackageProductos.Productos_Controlador;
 import PackageProductos.Productos_Object;
 import PackageProductos.Productos_Vista;
+import PackageTools.Validaciones;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.HeadlessException;
-import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 public class Productos_Actualizar_Vista extends javax.swing.JFrame {
 
-    //OBJETOS DEL CONTROLADOR DE PRODUCTO Y EMPRESA
+    // CONTROLADOR DE PRODUCTO Y EMPRESA
     private final Productos_Controlador controladorProducto = new Productos_Controlador();
-    private final Empresas_Controlador controladorEmpresa = new Empresas_Controlador();
-    
+    private final Empresas_Controlador controladorEmpresa = new Empresas_Controlador();   
 
-    //OBJETO DE LA VISTA PRODUCTO PRINCIPAL
+    // VARIABLE VISTA-PRODUCTO PRINCIPAL
     private final Productos_Vista vistaP;
 
-    //OBJETO DE PRODUCTO
+    // VARIABLE-PRODUCTO
     private Productos_Object producto;
 
-    //OBJETO INDICE TABLA
+    // INDICE-TABLA
     private int indice;
     
-    //OBJETO INDICE CATEGORIA
+    // INDICE-CATEGORIA
     private int indiceC;
 
-    //MODELO DE LA TABLA
+    // MODELO DE LA TABLA
     private DefaultTableModel modelo;
 
-    //CONSTRUCTOR
+    // CONSTRUCTOR
     public Productos_Actualizar_Vista(Productos_Vista vistaP, Productos_Object producto, int indice , int indiceC ) {
         initComponents();
         this.setLocationRelativeTo(null);
+        
+        // APLICAMOS LAS VARIABLES PRODUCTO
         this.vistaP = vistaP;
         this.producto = producto;
+        
+        // APLICAMOS LOS INDICES
         this.indice = indice;
         this.indiceC = indiceC;
 
-        //CARGAMOS LAS EMPRESAS Y DATOS DEL PRODUCTO
-        cargarDatos(this.producto, this.indice , this.indiceC);
+        // CARGAMOS LAS EMPRESAS Y DATOS DEL PRODUCTO
+        cargarDatos();
+    }
+    
+    // GETTERS AND SETTERS
+    public Productos_Object getProducto() {
+        return producto;
     }
 
-    //METODO PARA CARGAR LAS EMPRESAS EN LA TABLA Y LOS DATOS DEL PRODUCTO
-    public void cargarDatos(Productos_Object producto, int indice , int indiceC) {
-
+    public void setProducto(Productos_Object producto) {
         this.producto = producto;
-        this.indice = indice;
-        this.indiceC = indiceC;
+    }
 
-        //CARGAMOS LOS DATOS DEL PRODUCTO
+    public int getIndice() {
+        return indice;
+    }
+
+    public void setIndice(int indice) {
+        this.indice = indice;
+    }
+
+    public int getIndiceC() {
+        return indiceC;
+    }
+
+    public void setIndiceC(int indiceC) {
+        this.indiceC = indiceC;
+    }
+
+    // METODO PARA CARGAR LAS EMPRESAS EN LA TABLA Y LOS DATOS DEL PRODUCTO
+    public void cargarDatos() {
+
+        // CARGAMOS LOS DATOS DEL PRODUCTO
         this.txtIdentificador.setText(this.producto.getIdentificador());
         this.txtNombre.setText(this.producto.getNombre());
         this.txtPrecio.setText(String.valueOf(this.producto.getPrecio()));
         this.spnStock.setValue(this.producto.getStock());
         this.cmbCategorias.setSelectedIndex(this.indiceC);
 
-        //SE APLICA LAS COLUMNAS
+        // SE APLICA LAS COLUMNAS
         String columnas[] = {"ID", "NOMBRE"};
         this.modelo = new DefaultTableModel(columnas, 0);
 
-        //OBTENEMOS LAS EMPRESAS
-        List<Empresas_Object> listaEmpresas = this.controladorEmpresa.obtenerTodasEmpresas_C();
+        // LIMPIAMOS LA TABLA
+        this.modelo.setRowCount(0);
 
-        //CARGAMOS TODOS LOS DATOS           
-        Object arrayObjetos[] = new Object[2];
-        for (Empresas_Object aux : listaEmpresas) {
-            arrayObjetos[0] = aux.getId_empresa();
-            arrayObjetos[1] = aux.getNombre();
-            this.modelo.addRow(arrayObjetos);
-        }
+        // TOTAL DE EMPRESAS
+        int totalEmpresas = this.controladorEmpresa.totalEmpresas().join();
 
-        this.tablaEmpresas.setModel(this.modelo);
+        if (totalEmpresas != 0) {
 
-        //SELECCIONAMOS FILA DE LA TABLA
-        if (this.indice != -1) {
-            this.tablaEmpresas.setRowSelectionInterval(this.indice, this.indice);
+            // OBTENEMOS LAS EMPRESAS
+            this.controladorEmpresa.obtenerTodasEmpresas_C().thenAccept(listaEmpresas -> {
+            
+                // CARGAMOS TODOS LOS DATOS           
+                Object arrayObjetos[] = new Object[2];
+                for (Empresas_Object aux : listaEmpresas) {
+                    arrayObjetos[0] = aux.getId_empresa();
+                    arrayObjetos[1] = aux.getNombre();
+                    this.modelo.addRow(arrayObjetos);
+                }
+
+                this.tablaEmpresas.setModel(this.modelo);
+
+                // SELECCIONAMOS FILA DE LA TABLA
+                if (this.indice != -1) {
+                    this.tablaEmpresas.setRowSelectionInterval(this.indice, this.indice);
+                }
+            
+            }).exceptionally(ex ->{
+                return null;
+            });
+
+        }else{
+            this.tablaEmpresas.setModel(this.modelo);
         }
 
     }
 
-    //COMPONENTES DE LA INTERFAZ
+    // COMPONENTES DE LA INTERFAZ
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -297,72 +336,100 @@ public class Productos_Actualizar_Vista extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    // --- METODO PARA CAMBIAR LA ESTETICA DEL CURSOR Y EL BOTON ---
+    // METODO-ESTETICO
     private void btnActualizarMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnActualizarMouseEntered
         this.btnActualizar.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         this.btnActualizar.setBackground(Color.GRAY);
     }//GEN-LAST:event_btnActualizarMouseEntered
 
+    // METODO-ESTETICO
     private void btnActualizarMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnActualizarMouseExited
         this.btnActualizar.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnActualizarMouseExited
-    // --- METODO PARA CAMBIAR LA ESTETICA DEL CURSOR Y EL BOTON ---
 
-    //METODO PARA ACTUALIZAR EL EMPLEADO
+    // METODO PARA ACTUALIZAR EL EMPLEADO
     private void btnActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarActionPerformed
         try {
+            
             String identificador = this.txtIdentificador.getText().toUpperCase();
             String nombre = this.txtNombre.getText().toUpperCase();
             double precio = Double.parseDouble(this.txtPrecio.getText());
-            int stock = (int)this.spnStock.getValue();
-            String categoria = (String)this.cmbCategorias.getSelectedItem();
+            int stock = (int) this.spnStock.getValue();
+            String categoria = (String) this.cmbCategorias.getSelectedItem();
+            
+            if(Validaciones.validarProducto(identificador, nombre, categoria)){
+                
+                this.controladorProducto.identificadorExistente(identificador).thenAccept(existe -> {
+                
+                    if(!existe || identificador.equals(this.producto.getIdentificador())){
+                        
+                        if (this.tablaEmpresas.getRowCount() != 0) {
 
-            if ((this.controladorProducto.comprobarCamposProducto_C(identificador, nombre, categoria)) &&
-                    (!this.controladorProducto.identificadorExistente(identificador) || identificador.equals(this.producto.getIdentificador()))){
-                    
-                if (this.tablaEmpresas.getRowCount() != 0) {
+                            if (this.tablaEmpresas.getSelectedRow() != -1) {
+                                this.controladorEmpresa.obtenerEmpresa_C((int) this.tablaEmpresas.getValueAt(this.tablaEmpresas.getSelectedRow(), 0)).thenAccept(empresa -> {
+                                
+                                    if(empresa != null){
+                                        
+                                        this.producto.setIdentificador(identificador);
+                                        this.producto.setNombre(nombre);
+                                        this.producto.setPrecio(precio);
+                                        this.producto.setStock(stock);
+                                        this.producto.setCategoria(categoria);
+                                        this.producto.setEmpresas_id_empresa_p(empresa);
+                                        this.controladorProducto.actualizarProducto_C(this.producto).thenRun(() -> {
+                                            this.vistaP.actualizarDatos(this.producto.getId_producto());
+                                        }).exceptionally(ex ->{
+                                            return null;
+                                        });
+                                        this.txtIdentificador.setText("");
+                                        this.txtNombre.setText("");
+                                        this.txtPrecio.setText("");
+                                        this.cmbCategorias.setSelectedIndex(0);
+                                        this.tablaEmpresas.clearSelection();
+                                        this.dispose();
+                                                                                
+                                    }
+                                
+                                }).exceptionally(ex ->{
+                                    return null;
+                                });
+                                
+                            } else {
+                                JOptionPane.showMessageDialog(null, "TIENES QUE SELECCIONAR UNA EMPRESA DE LA TABLA", "ACTUALIZAR PRODUCTO", JOptionPane.INFORMATION_MESSAGE);
+                            }
 
-                    if (this.tablaEmpresas.getSelectedRow() != -1) {
-                        Empresas_Object empresa = this.controladorEmpresa.obtenerEmpresa_C((int) this.tablaEmpresas.getValueAt(this.tablaEmpresas.getSelectedRow(), 0));
-                        this.producto.setIdentificador(identificador);
-                        this.producto.setNombre(nombre);
-                        this.producto.setPrecio(precio);
-                        this.producto.setStock(stock);
-                        this.producto.setCategoria(categoria);
-                        this.producto.setEmpresas_id_empresa_p(empresa);
-                        this.controladorProducto.actualizarProducto_C(this.producto);
-                        this.txtIdentificador.setText("");
-                        this.txtNombre.setText("");
-                        this.txtPrecio.setText("");
-                        this.cmbCategorias.setSelectedIndex(0);
-                        this.tablaEmpresas.clearSelection();
-                        this.dispose();
-                        this.vistaP.cargarDatosTabla("" , "");
-                    } else {
-                        JOptionPane.showMessageDialog(null, "TIENES QUE SELECCIONAR UNA EMPRESA DE LA TABLA", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
+                        } else {
+                            this.producto.setIdentificador(identificador);
+                            this.producto.setNombre(nombre);
+                            this.producto.setPrecio(precio);
+                            this.producto.setStock(stock);
+                            this.producto.setCategoria(categoria);
+                            this.controladorProducto.actualizarProducto_C(this.producto).thenRun(() -> {
+                                this.vistaP.actualizarDatos(this.producto.getId_producto());
+                            }).exceptionally(ex ->{
+                                return null;
+                            });
+                            this.txtIdentificador.setText("");
+                            this.txtNombre.setText("");
+                            this.cmbCategorias.setSelectedIndex(0);
+                            this.tablaEmpresas.clearSelection();
+                            this.dispose();
+                        }
+                        
+                    }else{
+                        JOptionPane.showMessageDialog(null, "IDENTIFICADOR YA EXISTENTE", "ACTUALIZAR PRODUCTO", JOptionPane.ERROR_MESSAGE);
                     }
-
-                } else {
-                    this.producto.setIdentificador(identificador);
-                    this.producto.setNombre(nombre);
-                    this.producto.setPrecio(precio);
-                    this.producto.setStock(stock);
-                    this.producto.setCategoria(categoria);
-                    this.controladorProducto.actualizarProducto_C(this.producto);
-                    this.txtIdentificador.setText("");
-                    this.txtNombre.setText("");
-                    this.cmbCategorias.setSelectedIndex(0);
-                    this.tablaEmpresas.clearSelection();
-                    this.dispose();
-                    this.vistaP.cargarDatosTabla("" , "");
-                }
-
-            } else {
-                JOptionPane.showMessageDialog(null, "IDENTIFICADOR YA EXISTENTE O ERROR EN ALGUN CAMPO", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
+                
+                }).exceptionally(ex ->{
+                    return null;
+                });
+                
+            }else{
+                JOptionPane.showMessageDialog(null, "HAS INTRODUCIDO UN DATO ERRONEO", "ACTUALIZAR PRODUCTO", JOptionPane.ERROR_MESSAGE);
             }
 
         } catch (HeadlessException | NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "ERROR EN ALGUN CAMPO", "INFORMACION", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "HAS INTRODUCIDO UN DATO ERRONEO", "ACTUALIZAR PRODUCTO", JOptionPane.ERROR_MESSAGE);
         }
 
     }//GEN-LAST:event_btnActualizarActionPerformed

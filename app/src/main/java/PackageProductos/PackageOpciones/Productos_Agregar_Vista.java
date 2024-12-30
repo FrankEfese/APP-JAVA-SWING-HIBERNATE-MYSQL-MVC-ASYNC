@@ -1,64 +1,79 @@
 package PackageProductos.PackageOpciones;
 
-
 import PackageEmpresas.Empresas_Controlador;
 import PackageEmpresas.Empresas_Object;
 import PackageProductos.Productos_Controlador;
 import PackageProductos.Productos_Object;
 import PackageProductos.Productos_Vista;
+import PackageTools.Validaciones;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.HeadlessException;
 import java.util.Date;
-import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 public class Productos_Agregar_Vista extends javax.swing.JFrame {
 
-    //OBJETOS DEL CONTROLADOR DE PRODUCTO Y EMPRESA 
+    // CONTROLADOR DE PRODUCTO Y EMPRESA 
     private final Productos_Controlador controladorProducto = new Productos_Controlador();
-    private final Empresas_Controlador controladorEmpresa = new Empresas_Controlador();
-    
+    private final Empresas_Controlador controladorEmpresa = new Empresas_Controlador();   
 
-    //OBJETO DE LA VISTA PRODUCTO PRINCIPAL
+    // VARIABLE VISTA-PRODUCTOS PRINCIPAL
     private final Productos_Vista vistaP;
 
-    //MODELO DE LA TABLA
+    // MODELO DE LA TABLA
     private DefaultTableModel modelo;
 
-    //CONSTRUCTOR
+    // CONSTRUCTOR
     public Productos_Agregar_Vista(Productos_Vista vistaP) {
         initComponents();
         this.setLocationRelativeTo(null);
+        
+        // APLICAMOS LA VISTA-PRODUCTOS PRINCIPAL
         this.vistaP = vistaP;
 
-        //CARGAMOS LAS EMPRESAS
+        // CARGAMOS LAS EMPRESAS
         cargarDatos();
     }
 
-    //METODO PARA CARGAR LAS EMPRESAS EN LA TABLA
+    // METODO PARA CARGAR LAS EMPRESAS EN LA TABLA
     public void cargarDatos() {
-        //SE APLICA LAS COLUMNAS
-        String columnas[] = {"ID","ID-EMPRESARIAL", "NOMBRE"};
+        
+        // SE APLICA LAS COLUMNAS
+        String columnas[] = {"ID", "ID-EMPRESARIAL", "NOMBRE"};
         this.modelo = new DefaultTableModel(columnas, 0);
 
-        //OBTENEMOS LAS EMPRESAS
-        List<Empresas_Object> listaEmpresas = this.controladorEmpresa.obtenerTodasEmpresas_C();
+        // LIMPIAMOS LA TABLA
+        this.modelo.setRowCount(0);
 
-        //CARGAMOS TODOS LOS DATOS           
-        Object arrayObjetos[] = new Object[3];
-        for (Empresas_Object aux : listaEmpresas) {
-            arrayObjetos[0] = aux.getId_empresa();
-            arrayObjetos[1] = aux.getId_empresarial();
-            arrayObjetos[2] = aux.getNombre();
-            this.modelo.addRow(arrayObjetos);
+        // TOTAL DE EMPRESAS
+        int totalEmpresas = this.controladorEmpresa.totalEmpresas().join();
+
+        if (totalEmpresas != 0) {
+
+            // OBTENEMOS LAS EMPRESAS
+            this.controladorEmpresa.obtenerTodasEmpresas_C().thenAccept(listaEmpresas -> {
+            
+                // CARGAMOS TODOS LOS DATOS           
+                Object arrayObjetos[] = new Object[3];
+                for (Empresas_Object aux : listaEmpresas) {
+                    arrayObjetos[0] = aux.getId_empresa();
+                    arrayObjetos[1] = aux.getId_empresarial();
+                    arrayObjetos[2] = aux.getNombre();
+                    this.modelo.addRow(arrayObjetos);
+                }
+
+                this.tablaEmpresas.setModel(this.modelo);
+                
+            });
+            
+        }else{
+            this.tablaEmpresas.setModel(this.modelo);
         }
-
-        this.tablaEmpresas.setModel(this.modelo);
     }
 
-    //COMPONENTES DE LA INTERFAZ
+    // COMPONENTES DE LA INTERFAZ
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -273,56 +288,79 @@ public class Productos_Agregar_Vista extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    // --- METODO PARA CAMBIAR LA ESTETICA DEL CURSOR Y EL BOTON ---
+    // METODO-ESTETICO
     private void btnAgregarMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnAgregarMouseEntered
         this.btnAgregar.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         this.btnAgregar.setBackground(Color.GRAY);
     }//GEN-LAST:event_btnAgregarMouseEntered
 
+    // METODO-ESTETICO
     private void btnAgregarMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnAgregarMouseExited
         this.btnAgregar.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnAgregarMouseExited
-    // --- METODO PARA CAMBIAR LA ESTETICA DEL CURSOR Y EL BOTON ---
 
-    //METODO PARA AGREGAR EL PRODUCTO
+    // METODO PARA AGREGAR EL PRODUCTO
     private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
         try {
+            
             String identificador = this.txtIdentificador.getText().toUpperCase();
             String nombre = this.txtNombre.getText().toUpperCase();
             double precio = Double.parseDouble(this.txtPrecio.getText());
-            int stock = (int)this.spnStock.getValue();
-            String categoria = (String)this.cmbCategorias.getSelectedItem();
-
-            if ((this.controladorProducto.comprobarCamposProducto_C(identificador, nombre, categoria)) &&
-                    !(this.controladorProducto.identificadorExistente(identificador))){
-
-                if (this.tablaEmpresas.getSelectedRow() != -1) {
-                    Date fechaActual = new Date();
-                    Empresas_Object empresa = this.controladorEmpresa.obtenerEmpresa_C((int) this.tablaEmpresas.getValueAt(this.tablaEmpresas.getSelectedRow(), 0));
-                    Productos_Object producto = new Productos_Object(identificador, nombre, precio, categoria , stock, fechaActual, empresa);
-                    this.controladorProducto.guardarProducto_C(producto);
-                    this.txtIdentificador.setText("");
-                    this.txtNombre.setText("");
-                    this.txtPrecio.setText("");
-                    this.cmbCategorias.setSelectedIndex(0);
-                    this.tablaEmpresas.clearSelection();
-                    this.dispose();
-                    this.vistaP.cargarDatosTabla("" , "");
-                } else {
-                    JOptionPane.showMessageDialog(null, "TIENES QUE SELECCIONAR UNA EMPRESA DE LA TABLA", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
-                }
-
-            } else {
-                JOptionPane.showMessageDialog(null, "IDENTIFICADOR YA EXISTENTE O ERROR EN ALGUN CAMPO", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
+            int stock = (int) this.spnStock.getValue();
+            String categoria = (String) this.cmbCategorias.getSelectedItem();
+            
+            if(Validaciones.validarProducto(identificador, nombre, categoria)){
+                                
+                this.controladorProducto.identificadorExistente(identificador).thenAccept(existe -> {
+                
+                    if(!existe){
+                        
+                        if (this.tablaEmpresas.getSelectedRow() != -1) {
+                            Date fechaActual = new Date();
+                            this.controladorEmpresa.obtenerEmpresa_C((int) this.tablaEmpresas.getValueAt(this.tablaEmpresas.getSelectedRow(), 0)).thenAccept(empresa -> {
+                            
+                                if(empresa != null){
+                                    Productos_Object producto = new Productos_Object(identificador, nombre, precio, categoria, stock, fechaActual, empresa);
+                                    this.controladorProducto.guardarProducto_C(producto).thenRun(() -> {
+                                        this.vistaP.cargarDatosTabla("", "");
+                                    }).exceptionally(ex -> {
+                                        return null;
+                                    });
+                                    this.txtIdentificador.setText("");
+                                    this.txtNombre.setText("");
+                                    this.txtPrecio.setText("");
+                                    this.cmbCategorias.setSelectedIndex(0);
+                                    this.tablaEmpresas.clearSelection();
+                                    this.dispose();                                  
+                                }
+                            
+                            }).exceptionally(ex -> {
+                                return null;
+                            });
+                            
+                        } else {
+                            JOptionPane.showMessageDialog(null, "TIENES QUE SELECCIONAR UNA EMPRESA DE LA TABLA", "AGREGAR PRODUCTO", JOptionPane.INFORMATION_MESSAGE);
+                        }
+                        
+                    }else{
+                        JOptionPane.showMessageDialog(null, "IDENTIFICADOR YA EXISTENTE", "AGREGAR PRODUCTO", JOptionPane.INFORMATION_MESSAGE);
+                    }
+                
+                }).exceptionally(ex -> {
+                    return null;
+                });
+                
+            }else{
+                JOptionPane.showMessageDialog(null, "HAS INTRODUCIDO UN DATO ERRONEO", "AGREGAR PRODUCTO", JOptionPane.ERROR_MESSAGE);
             }
 
         } catch (HeadlessException | NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "ERROR EN ALGUN CAMPO", "INFORMACION", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "HAS INTRODUCIDO UN DATO ERRONEO", "AGREGAR PRODUCTO", JOptionPane.ERROR_MESSAGE);
         }
 
     }//GEN-LAST:event_btnAgregarActionPerformed
 
-    //METODO PARA CUANDO SE CIERRA LA VENTANA
+    // METODO PARA CUANDO SE CIERRA LA VENTANA
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
         this.txtIdentificador.setText("");
         this.txtNombre.setText("");

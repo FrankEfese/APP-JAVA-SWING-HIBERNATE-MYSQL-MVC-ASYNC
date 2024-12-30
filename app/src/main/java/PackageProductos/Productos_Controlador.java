@@ -4,62 +4,66 @@ import Proyecto_Java.HibernateUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class Productos_Controlador {
 
-    //OBJETO MODELO DE PRODUCTOS
+    // MODELO-PRODUCTOS
     private final Productos_Modelo modeloProducto = new Productos_Modelo(HibernateUtil.getSessionFactory());
 
-    //CONSTRUCTOR
+    // CONSTRUCTOR
     public Productos_Controlador() {
     }
 
-    //METODO PARA OBTENER TODOS LOS PRODUCTOS (CONTROLADOR)
-    public List<Productos_Object> obtenerTodosProductos_C() {
-        return modeloProducto.obtenerTodosProductos_M();
+    // METODO PARA OBTENER TODOS LOS PRODUCTOS (CONTROLADOR)
+    public CompletableFuture<List<Productos_Object>> obtenerTodosProductos_C() {
+        return CompletableFuture.supplyAsync(() -> this.modeloProducto.obtenerTodosProductos_M());
     }
 
-    //METODO PARA GUARDAR EL PRODUCTO (CONTROLADOR)
-    public void guardarProducto_C(Productos_Object producto) {
-        modeloProducto.guardarProducto_M(producto);
+    // METODO PARA GUARDAR EL PRODUCTO (CONTROLADOR)
+    public CompletableFuture<Void> guardarProducto_C(Productos_Object producto) {
+        return CompletableFuture.runAsync(() -> this.modeloProducto.guardarProducto_M(producto));
     }
 
-    //METODO PARA ELIMINAR UN PRODUCTO (CONTROLADOR)
-    public void eliminarProducto_C(int idProducto) {
-        modeloProducto.eliminarProducto_M(idProducto);
+    // METODO PARA ELIMINAR UN PRODUCTO (CONTROLADOR)
+    public CompletableFuture<Void> eliminarProducto_C(int idProducto) {
+        return CompletableFuture.runAsync(() -> this.modeloProducto.eliminarProducto_M(idProducto));
     }
 
-    //METODO PARA ACTUALIZAR EL PRODUCTO (CONTROLADOR)
-    public void actualizarProducto_C(Productos_Object producto) {
-        modeloProducto.actualizarProducto_M(producto);
+    // METODO PARA ACTUALIZAR EL PRODUCTO (CONTROLADOR)
+    public CompletableFuture<Void> actualizarProducto_C(Productos_Object producto) {
+        return CompletableFuture.runAsync(() -> this.modeloProducto.actualizarProducto_M(producto));
     }
 
-    //METODO PARA OBTENER UN PRODUCTO (CONTROLADOR)
-    public Productos_Object obtenerProducto_C(int idProducto) {
-        return modeloProducto.obtenerProducto_M(idProducto);
+    // METODO PARA OBTENER UN PRODUCTO (CONTROLADOR)
+    public CompletableFuture<Productos_Object> obtenerProducto_C(int idProducto) {
+        return CompletableFuture.supplyAsync(() -> this.modeloProducto.obtenerProducto_M(idProducto));
+    }
+    
+    // METODO PARA OBTENER EL TOTAL DE PRODUCTOS (CONTROLADOR)
+    public CompletableFuture<Integer> totalProductos(){
+        return CompletableFuture.supplyAsync(() -> this.modeloProducto.obtenerTotalProductos_M());
     }
 
-    //METODO PARA COMPROBAR LOS CAMPOS DEL IDENTIFICADOR , NOMBRE , CATEGORIA 
-    public boolean comprobarCamposProducto_C(String identificador, String nombre, String categoria) {
-        return (!identificador.isEmpty() && identificador.length() < 26) && (!nombre.isEmpty() && nombre.length() < 26)
-                && (!categoria.equals("--- SELECCIONAR ---"));
-    }
-
-    //METODO PARA COMPROBAR LA EXISTENCIA DEL IDENTIFICADOR
-    public boolean identificadorExistente(String identificador) {
-        boolean existe = false;
-        for (Productos_Object aux : obtenerTodosProductos_C()) {
-            if (aux.getIdentificador().equals(identificador)) {
-                existe = true;
-                break;
+    // METODO PARA COMPROBAR LA EXISTENCIA DEL IDENTIFICADOR
+    public CompletableFuture<Boolean> identificadorExistente(String identificador) {
+        
+        return obtenerTodosProductos_C().thenApply(productos -> {      
+            for(Productos_Object aux : productos){
+                if(aux.getIdentificador().equals(identificador)){
+                    return true;
+                }
             }
-        }
-        return existe;
+            return false;            
+        }).exceptionally(ex -> {
+            return false;
+        });
+        
     }
 
-    //METODO PARA OBTENER INDICE SELECCIONADO DEL COMBO
+    // METODO PARA OBTENER INDICE SELECCIONADO DEL COMBO
     public int obtenerIndiceCombo(String categoria) {
-        List<String> categorias = new ArrayList<>(Arrays.asList("-- SELECCIONAR --", "ALIMENTACION", "ROPA", "DEPORTES", "VIDEOJUEGOS" , "COSAS VARIAS"));
+        List<String> categorias = new ArrayList<>(Arrays.asList("--- SELECCIONAR ---", "ALIMENTACION", "ROPA", "DEPORTES", "VIDEOJUEGOS" , "COSAS VARIAS"));
         return categorias.indexOf(categoria);
     }
 

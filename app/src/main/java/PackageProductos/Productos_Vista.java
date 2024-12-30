@@ -6,34 +6,38 @@ import PackageProductos.PackageOpciones.Productos_Agregar_Vista;
 import PackageProductos.PackageOpciones.Productos_VerProducto_Vista;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.event.ItemEvent;
 import java.text.SimpleDateFormat;
-import java.util.List;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
 public class Productos_Vista extends javax.swing.JPanel {
 
-    //OBJETO DEL CONTROLADOR DE PRODUCTOS Y EMPRESAS 
+    // VARIABLE CHECK-EVENTO-CMB
+    public boolean saltarEvento = false;
+    
+    // CONTROLADOR DE PRODUCTOS Y EMPRESAS
     private final Productos_Controlador controladorProductos = new Productos_Controlador();
     private final Empresas_Controlador controladorEmpresas = new Empresas_Controlador();
 
-    //MODELO DE LA TABLA
+    // MODELO DE LA TABLA
     private DefaultTableModel modelo;
 
-    //VISTAS DE OPCIONES
+    // VARIABLES VISTAS-OPCIONES
     private Productos_VerProducto_Vista verProductoVista;
     private Productos_Agregar_Vista agregarProductoVista;
-    private Productos_Actualizar_Vista actualizarProductoVista;
+    private Productos_Actualizar_Vista actualizarProductoVista;   
     
-    
-    //CONSTRUCTOR
+    // CONSTRUCTOR
     public Productos_Vista() {
         initComponents();
-        //LLAMAMOS AL METODO PARA CARGAR LOS DATOS EN LA TABLA
+        
+        // LLAMAMOS AL METODO PARA CARGAR LOS DATOS EN LA TABLA
         cargarDatosTabla("", "");
     }
 
-    //COMPONENTES DE LA INTERFAZ
+    // COMPONENTES DE LA INTERFAZ
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -346,227 +350,270 @@ public class Productos_Vista extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    //METODO PARA CARGAR LOS DATOS DE LOS PRODUCTOS EN LA TABLA
+    // METODO PARA CARGAR LOS DATOS DE LOS PRODUCTOS EN LA TABLA
     public void cargarDatosTabla(String texto, String categoria) {
 
-        //SE APLICA LAS COLUMNAS
+        // DESHABILITAMOS LA TABLA TEMPORALMENTE
+        this.tablaProductos.setEnabled(false);
+
+        // SE APLICA LAS COLUMNAS
         String columnas[] = {"ID", "IDENTIFICADOR", "NOMBRE", "PRECIO", "CATEGORIA", "STOCK", "EMPRESA", "FECHA ALTA"};
         this.modelo = new DefaultTableModel(columnas, 0);
 
-        //FORMATO FECHA
+        // LIMPIAMOS LA TABLA
+        this.modelo.setRowCount(0);
+
+        // FORMATO FECHA
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 
-        //OBTENEMOS LOS PRODUCTOS
-        List<Productos_Object> listaProductos = this.controladorProductos.obtenerTodosProductos_C();
+        // OBTENEMOS LOS PRODUCTOS
+        this.controladorProductos.obtenerTodosProductos_C().thenAccept(listaProductos -> {
 
-        //APLICAMOS EL TOTAL DE PRODUCTOS
-        this.txtTotalProductos.setText("* Total de Productos : " + listaProductos.size());
+            if (texto.isEmpty() && categoria.isEmpty()) {
 
-        if (texto.isEmpty() && categoria.isEmpty()) {
+                // CARGAMOS TODOS LOS DATOS           
+                Object arrayObjetos[] = new Object[8];
+                for (Productos_Object aux : listaProductos) {
+                    arrayObjetos[0] = aux.getId_producto();
+                    arrayObjetos[1] = aux.getIdentificador();
+                    arrayObjetos[2] = aux.getNombre();
+                    arrayObjetos[3] = String.valueOf(aux.getPrecio() + " €");
+                    arrayObjetos[4] = aux.getCategoria();
+                    arrayObjetos[5] = aux.getStock();
+                    arrayObjetos[6] = aux.getEmpresas_id_empresa_p().getNombre();
+                    arrayObjetos[7] = dateFormat.format(aux.getF_alta());
+                    this.modelo.addRow(arrayObjetos);
+                }
 
-            //CARGAMOS TODOS LOS DATOS           
-            Object arrayObjetos[] = new Object[8];
-            for (Productos_Object aux : listaProductos) {
-                arrayObjetos[0] = aux.getId_producto();
-                arrayObjetos[1] = aux.getIdentificador();
-                arrayObjetos[2] = aux.getNombre();
-                arrayObjetos[3] = String.valueOf(aux.getPrecio() + " €");
-                arrayObjetos[4] = aux.getCategoria();
-                arrayObjetos[5] = aux.getStock();
-                arrayObjetos[6] = this.controladorEmpresas.obtenerEmpresa_C(aux.getEmpresas_id_empresa_p().getId_empresa()).getNombre();
-                arrayObjetos[7] = dateFormat.format(aux.getF_alta());
-                this.modelo.addRow(arrayObjetos);
-            }
+                SwingUtilities.invokeLater(() -> {
+                    this.tablaProductos.setModel(modelo);
+                    this.tablaProductos.setEnabled(true);
+                    this.txtTotalProductos.setText("* Total de Productos : " + this.tablaProductos.getRowCount());
+                });
 
-            this.tablaProductos.setModel(this.modelo);
+            } else {
 
-        } else {
+                // CARGAMOS LOS DATOS QUE CONTENGAN EL TEXTO INTRODUCIDO EN EL FILTRO Y LA CATEGORIA           
+                Object arrayObjetos[] = new Object[8];
+                for (Productos_Object aux : listaProductos) {
+                    if (!categoria.equals("--- SELECCIONAR ---")) {
+                        if (aux.getNombre().contains(texto.toUpperCase()) && aux.getCategoria().equals(categoria)) {
+                            arrayObjetos[0] = aux.getId_producto();
+                            arrayObjetos[1] = aux.getIdentificador();
+                            arrayObjetos[2] = aux.getNombre();
+                            arrayObjetos[3] = String.valueOf(aux.getPrecio() + " €");
+                            arrayObjetos[4] = aux.getCategoria();
+                            arrayObjetos[5] = aux.getStock();
+                            arrayObjetos[6] = aux.getEmpresas_id_empresa_p().getNombre();
+                            arrayObjetos[7] = dateFormat.format(aux.getF_alta());
+                            this.modelo.addRow(arrayObjetos);
 
-            //CARGAMOS LOS DATOS QUE CONTENGAN EL TEXTO INTRODUCIDO EN EL FILTRO Y LA CATEGORIA           
-            Object arrayObjetos[] = new Object[8];
-            for (Productos_Object aux : listaProductos) {
-                if (!categoria.equals("--- SELECCIONAR ---")) {
-                    if (aux.getNombre().contains(texto.toUpperCase()) && aux.getCategoria().equals(categoria)) {
-                        arrayObjetos[0] = aux.getId_producto();
-                        arrayObjetos[1] = aux.getIdentificador();
-                        arrayObjetos[2] = aux.getNombre();
-                        arrayObjetos[3] = String.valueOf(aux.getPrecio() + " €");
-                        arrayObjetos[4] = aux.getCategoria();
-                        arrayObjetos[5] = aux.getStock();
-                        arrayObjetos[6] = this.controladorEmpresas.obtenerEmpresa_C(aux.getEmpresas_id_empresa_p().getId_empresa()).getNombre();
-                        arrayObjetos[7] = dateFormat.format(aux.getF_alta());
-                        this.modelo.addRow(arrayObjetos);
-                        
-                    }
+                        }
 
-                } else {
+                    } else {
 
-                    if (aux.getNombre().contains(texto.toUpperCase())) {
-                        arrayObjetos[0] = aux.getId_producto();
-                        arrayObjetos[1] = aux.getIdentificador();
-                        arrayObjetos[2] = aux.getNombre();
-                        arrayObjetos[3] = aux.getPrecio();
-                        arrayObjetos[4] = aux.getCategoria();
-                        arrayObjetos[5] = aux.getStock();
-                        arrayObjetos[6] = this.controladorEmpresas.obtenerEmpresa_C(aux.getEmpresas_id_empresa_p().getId_empresa()).getNombre();
-                        arrayObjetos[7] = dateFormat.format(aux.getF_alta());
-                        this.modelo.addRow(arrayObjetos);
-                        
+                        if (aux.getNombre().contains(texto.toUpperCase())) {
+                            arrayObjetos[0] = aux.getId_producto();
+                            arrayObjetos[1] = aux.getIdentificador();
+                            arrayObjetos[2] = aux.getNombre();
+                            arrayObjetos[3] = aux.getPrecio();
+                            arrayObjetos[4] = aux.getCategoria();
+                            arrayObjetos[5] = aux.getStock();
+                            arrayObjetos[6] = aux.getEmpresas_id_empresa_p().getNombre();
+                            arrayObjetos[7] = dateFormat.format(aux.getF_alta());
+                            this.modelo.addRow(arrayObjetos);
 
+                        }
                     }
                 }
-            }
-            
-            this.tablaProductos.setModel(this.modelo);
-        }
+
+                SwingUtilities.invokeLater(() -> {
+                    this.tablaProductos.setModel(modelo);
+                    this.tablaProductos.setEnabled(true);
+                    this.txtTotalProductos.setText("* Total de Productos : " + this.tablaProductos.getRowCount());
+                });
+            }            
+
+        });
     }
     
     
-    // --- METODOS PARA CAMBIAR LA ESTETICA DEL CURSOR Y EL BOTON ---
+    // METODO-ESTETICO
     private void btnVerProductoMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnVerProductoMouseEntered
         this.btnVerProducto.setBackground(Color.GRAY);
         this.btnVerProducto.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }//GEN-LAST:event_btnVerProductoMouseEntered
 
+    // METODO-ESTETICO
     private void btnVerProductoMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnVerProductoMouseExited
         this.btnVerProducto.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnVerProductoMouseExited
 
+    // METODO-ESTETICO
     private void btnAgregarProductoMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnAgregarProductoMouseEntered
         this.btnAgregarProducto.setBackground(Color.GRAY);
         this.btnAgregarProducto.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }//GEN-LAST:event_btnAgregarProductoMouseEntered
 
+    // METODO-ESTETICO
     private void btnAgregarProductoMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnAgregarProductoMouseExited
         this.btnAgregarProducto.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnAgregarProductoMouseExited
 
+    // METODO-ESTETICO
     private void btnActualizarProductoMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnActualizarProductoMouseEntered
         this.btnActualizarProducto.setBackground(Color.GRAY);
         this.btnActualizarProducto.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }//GEN-LAST:event_btnActualizarProductoMouseEntered
 
+    // METODO-ESTETICO
     private void btnActualizarProductoMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnActualizarProductoMouseExited
         this.btnActualizarProducto.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnActualizarProductoMouseExited
 
+    // METODO-ESTETICO
     private void btnEliminarProductoMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEliminarProductoMouseEntered
         this.btnEliminarProducto.setBackground(Color.GRAY);
         this.btnEliminarProducto.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }//GEN-LAST:event_btnEliminarProductoMouseEntered
 
+    // METODO-ESTETICO
     private void btnEliminarProductoMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEliminarProductoMouseExited
         this.btnEliminarProducto.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnEliminarProductoMouseExited
 
+    // METODO-ESTETICO
     private void btnReinicioMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnReinicioMouseEntered
         this.btnReinicio.setBackground(Color.GRAY);
         this.btnReinicio.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }//GEN-LAST:event_btnReinicioMouseEntered
 
+    // METODO-ESTETICO
     private void btnReinicioMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnReinicioMouseExited
         this.btnReinicio.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnReinicioMouseExited
-    // --- METODOS PARA CAMBIAR LA ESTETICA DEL CURSOR Y EL BOTON ---
 
-    //METODO PARA EL FILTRO DE BUSQUEDA
+    // METODO PARA EL FILTRO DE BUSQUEDA
     private void txtFiltroKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtFiltroKeyReleased
         String texto = this.txtFiltro.getText();
         String categoria = String.valueOf(this.cmbCategorias.getSelectedItem());
         cargarDatosTabla(texto,categoria);
     }//GEN-LAST:event_txtFiltroKeyReleased
 
-    //METODO PARA REINICIAR EL FILTRO , LAS CATEGORIAS Y RECARGAR LA TABLA
+    // METODO PARA REINICIAR EL FILTRO , LAS CATEGORIAS Y RECARGAR LA TABLA
     private void btnReinicioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReinicioActionPerformed
+        this.saltarEvento = true;
         this.txtFiltro.setText("");
         this.cmbCategorias.setSelectedIndex(0);
-        cargarDatosTabla("" , "");
+        cargarDatosTabla("", "");
+        this.saltarEvento = false;
     }//GEN-LAST:event_btnReinicioActionPerformed
 
-    //METODO PARA EL FILTRO DE CATEGORIA
+    // METODO PARA EL FILTRO DE CATEGORIA
     private void cmbCategoriasItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbCategoriasItemStateChanged
-        String texto = this.txtFiltro.getText();
-        String categoria = String.valueOf(this.cmbCategorias.getSelectedItem());
-        cargarDatosTabla(texto,categoria);
+        if (!this.saltarEvento && evt.getStateChange() == ItemEvent.SELECTED) {
+            String texto = this.txtFiltro.getText();
+            String categoria = String.valueOf(this.cmbCategorias.getSelectedItem());
+            cargarDatosTabla(texto, categoria);
+        }
     }//GEN-LAST:event_cmbCategoriasItemStateChanged
-
     
-    //METODO PARA ELIMINAR UN PRODUCTO
+    // METODO PARA ELIMINAR UN PRODUCTO
     private void btnEliminarProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarProductoActionPerformed
-        if(this.tablaProductos.getSelectedRow() != -1){
-            int respuesta = JOptionPane.showConfirmDialog(null, "¿DESEAS ELIMINAR EL PRODUCTO SELECCIONADO?", "INFORMACION", JOptionPane.YES_NO_OPTION);
+        if (this.tablaProductos.getSelectedRow() != -1) {
+            int respuesta = JOptionPane.showConfirmDialog(null, "¿DESEAS ELIMINAR EL PRODUCTO SELECCIONADO?", "PRODUCTOS", JOptionPane.YES_NO_OPTION);
             if (respuesta == JOptionPane.YES_OPTION) {
                 int idProducto = (int) this.tablaProductos.getValueAt(this.tablaProductos.getSelectedRow(), 0);
-                this.controladorProductos.eliminarProducto_C(idProducto);
-                cargarDatosTabla("" , "");
+                this.controladorProductos.eliminarProducto_C(idProducto).thenRun(() -> {
+                    cargarDatosTabla("", "");
+                }).exceptionally(ex -> {
+                    return null;
+                });
+
+                if (this.verProductoVista != null && this.verProductoVista.getIdProducto() == idProducto) {
+                    this.verProductoVista.dispose();
+                }
+
+                if (this.actualizarProductoVista != null && this.actualizarProductoVista.getProducto().getId_producto() == idProducto) {
+                    this.actualizarProductoVista.dispose();
+                }
             }
-        }else {
-            JOptionPane.showMessageDialog(null, "DEBES SELECCIONAR UNA FILA DE LA TABLA", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(null, "DEBES SELECCIONAR UNA FILA DE LA TABLA", "PRODUCTOS", JOptionPane.INFORMATION_MESSAGE);
         }
     }//GEN-LAST:event_btnEliminarProductoActionPerformed
 
     
-    //METODO PARA ABRIR LA PESTAÑA QUE PERMITE VER LA INFORMACION DEL PRODUCTO
+    // METODO PARA ABRIR LA PESTAÑA QUE PERMITE VER LA INFORMACION DEL PRODUCTO
     private void btnVerProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerProductoActionPerformed
-        if(this.tablaProductos.getSelectedRow() != -1){
-            
-            Productos_Object producto = this.controladorProductos.obtenerProducto_C((int) this.tablaProductos.getValueAt(this.tablaProductos.getSelectedRow(), 0));
-            if (producto != null) {
+        if (this.tablaProductos.getSelectedRow() != -1) {
+            int idProducto = (int) this.tablaProductos.getValueAt(this.tablaProductos.getSelectedRow(), 0);
+            if (idProducto > 0) {
 
                 if (this.verProductoVista == null) {
-                    this.verProductoVista = new Productos_VerProducto_Vista(producto);
+                    this.verProductoVista = new Productos_VerProducto_Vista(idProducto);
                     this.verProductoVista.setVisible(true);
                 } else {
-                    this.verProductoVista.cargarDatos(producto);
+                    this.verProductoVista.setIdProducto(idProducto);
+                    this.verProductoVista.cargarDatos();
                     this.verProductoVista.setVisible(true);
                 }
             }
-            
-        }else{
-            JOptionPane.showMessageDialog(null, "DEBES SELECCIONAR UNA FILA DE LA TABLA", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
+
+        } else {
+            JOptionPane.showMessageDialog(null, "DEBES SELECCIONAR UNA FILA DE LA TABLA", "PRODUCTOS", JOptionPane.INFORMATION_MESSAGE);
         }
     }//GEN-LAST:event_btnVerProductoActionPerformed
-
     
-    //METODO PARA ABRIR LA PESTAÑA QUE PERMITE AGREGAR UN PRODUCTO
+    // METODO PARA ABRIR LA PESTAÑA QUE PERMITE AGREGAR UN PRODUCTO
     private void btnAgregarProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarProductoActionPerformed
-        if (!this.controladorEmpresas.obtenerTodasEmpresas_C().isEmpty()) {
-            if (this.agregarProductoVista == null) {
-                this.agregarProductoVista = new Productos_Agregar_Vista(this);
-                this.agregarProductoVista.setVisible(true);
-            } else {
-                this.agregarProductoVista.setVisible(true);
-            }
-        } else {
-            JOptionPane.showMessageDialog(null, "AUN NO HAY EMPRESAS DISPONIBLES QUE APLICAR AL PRODUCTO", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
-        }
-    }//GEN-LAST:event_btnAgregarProductoActionPerformed
+        this.controladorEmpresas.totalEmpresas().thenAccept(total -> {
+            if (total > 0) {
 
+                if (this.agregarProductoVista == null) {
+                    this.agregarProductoVista = new Productos_Agregar_Vista(this);
+                    this.agregarProductoVista.setVisible(true);
+                } else {
+                    this.agregarProductoVista.setVisible(true);
+                }
+
+            } else {
+                JOptionPane.showMessageDialog(null, "AUN NO HAY EMPRESAS DISPONIBLES QUE APLICAR AL PRODUCTO", "PRODUCTOS", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+    }//GEN-LAST:event_btnAgregarProductoActionPerformed
     
-    //METODO PARA ABRIR LA PESTAÑA QUE PERMITE ACTUALIZAR UN PRODUCTO
+    // METODO PARA ABRIR LA PESTAÑA QUE PERMITE ACTUALIZAR UN PRODUCTO
     private void btnActualizarProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarProductoActionPerformed
         if (this.tablaProductos.getSelectedRow() != -1) {
             int idProducto = (int) this.tablaProductos.getValueAt(this.tablaProductos.getSelectedRow(), 0);
-            Productos_Object producto = this.controladorProductos.obtenerProducto_C(idProducto);
+            this.controladorProductos.obtenerProducto_C(idProducto).thenAccept(producto -> {
 
-            if (producto != null) {
-                int indice = this.controladorEmpresas.obtenerFilaTabla(producto.getEmpresas_id_empresa_p());
-                int indiceCat = this.controladorProductos.obtenerIndiceCombo(producto.getCategoria());
-                if (this.actualizarProductoVista == null) {
-                    this.actualizarProductoVista = new Productos_Actualizar_Vista(this, producto, indice , indiceCat);
-                    this.actualizarProductoVista.setVisible(true);
-                } else {
-                    this.actualizarProductoVista.cargarDatos(producto, indice,indiceCat);
-                    this.actualizarProductoVista.setVisible(true);
+                if (producto != null) {
+                    this.controladorEmpresas.obtenerFilaTabla(producto.getEmpresas_id_empresa_p()).thenAccept(indice -> {
+
+                        int indiceCat = this.controladorProductos.obtenerIndiceCombo(producto.getCategoria());
+                        if (this.actualizarProductoVista == null) {
+                            this.actualizarProductoVista = new Productos_Actualizar_Vista(this, producto, indice, indiceCat);
+                            this.actualizarProductoVista.setVisible(true);
+                        } else {
+                            this.actualizarProductoVista.setProducto(producto);
+                            this.actualizarProductoVista.setIndice(indice);
+                            this.actualizarProductoVista.setIndiceC(indiceCat);
+                            this.actualizarProductoVista.cargarDatos();
+                            this.actualizarProductoVista.setVisible(true);
+                        }
+
+                    });
                 }
-            }
+            });
 
         } else {
-            JOptionPane.showMessageDialog(null, "DEBES SELECCIONAR UNA FILA DE LA TABLA", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "DEBES SELECCIONAR UNA FILA DE LA TABLA", "PRODUCTOS", JOptionPane.INFORMATION_MESSAGE);
         }
     }//GEN-LAST:event_btnActualizarProductoActionPerformed
 
-    //METODO PARA CERRAR LAS VENTANAS
+    // METODO PARA CERRAR LAS VENTANAS
     public void eliminarVentanas(){
         
         if(this.verProductoVista != null){
@@ -578,11 +625,22 @@ public class Productos_Vista extends javax.swing.JPanel {
         }
         
         if(this.actualizarProductoVista != null){
-            this.agregarProductoVista.dispose();
+            this.actualizarProductoVista.dispose();
         }
         
     }
 
+    // METODO PARA ACTUALIZAR DATOS VENTANA-PRINCIPAL Y VENTANA VER-PRODUCTO
+    public void actualizarDatos(int idProducto){
+        
+        cargarDatosTabla("","");
+        
+        if(this.verProductoVista != null && this.verProductoVista.getIdProducto() == idProducto){
+            this.verProductoVista.setIdProducto(idProducto);
+            this.verProductoVista.cargarDatos();
+        }
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnActualizarProducto;
     private javax.swing.JButton btnAgregarProducto;

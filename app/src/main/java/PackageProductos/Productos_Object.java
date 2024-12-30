@@ -10,7 +10,7 @@ import javax.persistence.*;
 @Table(name = "productos")
 public class Productos_Object implements Serializable{
     
-    
+    // ATRIBUTOS
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id_producto")
@@ -35,16 +35,16 @@ public class Productos_Object implements Serializable{
     @Temporal(javax.persistence.TemporalType.DATE)
     private Date f_alta;
     
+    // RELACION 1 A MUCHOS CON EMPRESAS
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "empresas_id_empresa_p", nullable = true)
     private Empresas_Object empresas_id_empresa_p;
-
     
-    //CONSTRUCTOR
+    // CONSTRUCTOR
     public Productos_Object() {
     }
 
-    //CONSTRUCTOR
+    // CONSTRUCTOR
     public Productos_Object(int id_producto, String identificador, String nombre, double precio, String categoria, int stock, Date f_alta, Empresas_Object empresas_id_empresa_p) {
         this.id_producto = id_producto;
         this.identificador = identificador;
@@ -56,7 +56,7 @@ public class Productos_Object implements Serializable{
         this.empresas_id_empresa_p = empresas_id_empresa_p;
     }
 
-    //CONSTRUCTOR
+    // CONSTRUCTOR
     public Productos_Object(String identificador, String nombre, double precio, String categoria, int stock, Date f_alta, Empresas_Object empresas_id_empresa_p) {
         this.identificador = identificador;
         this.nombre = nombre;
@@ -66,9 +66,8 @@ public class Productos_Object implements Serializable{
         this.f_alta = f_alta;
         this.empresas_id_empresa_p = empresas_id_empresa_p;
     }
-
     
-    //GETTERS AND SETTERS
+    // GETTERS AND SETTERS
     public int getId_producto() {
         return id_producto;
     }
@@ -132,17 +131,11 @@ public class Productos_Object implements Serializable{
     public void setEmpresas_id_empresa_p(Empresas_Object empresas_id_empresa_p) {
         this.empresas_id_empresa_p = empresas_id_empresa_p;
     }
-
     
-    //TO STRING
+    // TO STRING
     @Override
     public String toString() {
         return "Productos_Object{" + "id_producto=" + id_producto + ", identificador=" + identificador + ", nombre=" + nombre + ", precio=" + precio + ", categoria=" + categoria + ", stock=" + stock + ", f_alta=" + f_alta + ", empresas_id_empresa_p=" + empresas_id_empresa_p + '}';
     }
-    
-    
-    
-    
-    
-    
+   
 }
