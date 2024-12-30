@@ -5,59 +5,77 @@ import PackageEmpleados.Empleados_Object;
 import PackageEmpleados.Empleados_Vista;
 import PackageEmpresas.Empresas_Controlador;
 import PackageEmpresas.Empresas_Object;
+import PackageTools.Validaciones;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.HeadlessException;
 import java.util.Date;
-import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 public class Empleados_Agregar_Vista extends javax.swing.JFrame {
 
-    //OBJETOS DEL CONTROLADOR DE EMPLEADO Y EMPRESA 
+    // CONTROLADOR DE EMPLEADO Y EMPRESA
     private final Empleados_Controlador controladorEmpleados = new Empleados_Controlador();
-    private final Empresas_Controlador controladorEmpresa = new Empresas_Controlador();
-    
+    private final Empresas_Controlador controladorEmpresa = new Empresas_Controlador();   
 
-    //OBJETO DE LA VISTA EMPLEADO PRINCIPAL
+    // VARIABLE VISTA-EMPLEADOS PRINCIPAL
     private final Empleados_Vista vistaE;
 
-    //MODELO DE LA TABLA
+    // MODELO DE LA TABLA
     private DefaultTableModel modelo;
 
-    //CONSTRUCTOR
+    // CONSTRUCTOR
     public Empleados_Agregar_Vista(Empleados_Vista vistaEmpleado) {
         initComponents();
         this.setLocationRelativeTo(null);
+        
+        // APLICAMOS LA VISTA-EMPLEADO PRINCIPAL
         this.vistaE = vistaEmpleado;
 
-        //CARGAMOS LOS SEGUROS
+        // CARGAMOS LOS SEGUROS
         cargarDatos();
     }
 
-    //METODO PARA CARGAR LAS EMPRESAS EN LA TABLA
+    // METODO PARA CARGAR LAS EMPRESAS EN LA TABLA
     public void cargarDatos() {
-        //SE APLICA LAS COLUMNAS
+        
+        // SE APLICA LAS COLUMNAS
         String columnas[] = {"ID","ID-EMPRESARIAL", "NOMBRE"};
         this.modelo = new DefaultTableModel(columnas, 0);
+        
+        // LIMPIAMOS LA TABLA
+        this.modelo.setRowCount(0);
+        
+        // TOTAL DE EMPRESAS
+        int totalEmpresas = this.controladorEmpresa.totalEmpresas().join();
+        
+        if(totalEmpresas != 0){
+            
+            // OBTENEMOS LAS EMPRESAS
+            this.controladorEmpresa.obtenerTodasEmpresas_C().thenAccept(listaEmpresas -> {
+            
+                //CARGAMOS TODOS LOS DATOS           
+                Object arrayObjetos[] = new Object[3];
+                for (Empresas_Object aux : listaEmpresas) {
+                    arrayObjetos[0] = aux.getId_empresa();
+                    arrayObjetos[1] = aux.getId_empresarial();
+                    arrayObjetos[2] = aux.getNombre();
+                    this.modelo.addRow(arrayObjetos);
+                }
 
-        //OBTENEMOS LAS EMPRESAS
-        List<Empresas_Object> listaEmpresas = this.controladorEmpresa.obtenerTodasEmpresas_C();
+                this.tablaEmpresas.setModel(this.modelo);
+                
+            }).exceptionally(ex -> {
+                return null;
+            });
 
-        //CARGAMOS TODOS LOS DATOS           
-        Object arrayObjetos[] = new Object[3];
-        for (Empresas_Object aux : listaEmpresas) {
-            arrayObjetos[0] = aux.getId_empresa();
-            arrayObjetos[1] = aux.getId_empresarial();
-            arrayObjetos[2] = aux.getNombre();
-            this.modelo.addRow(arrayObjetos);
-        }
-
-        this.tablaEmpresas.setModel(this.modelo);
+        }else{
+            this.tablaEmpresas.setModel(this.modelo);
+        } 
     }
 
-    //COMPONENTES DE LA INTERFAZ
+    // COMPONENTES DE LA INTERFAZ
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -257,54 +275,79 @@ public class Empleados_Agregar_Vista extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    // --- METODO PARA CAMBIAR LA ESTETICA DEL CURSOR Y EL BOTON ---
+    // METODO-ESTETICO
     private void btnAgregarMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnAgregarMouseEntered
         this.btnAgregar.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         this.btnAgregar.setBackground(Color.GRAY);
     }//GEN-LAST:event_btnAgregarMouseEntered
 
+    // METODO-ESTETICO
     private void btnAgregarMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnAgregarMouseExited
         this.btnAgregar.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnAgregarMouseExited
-    // --- METODO PARA CAMBIAR LA ESTETICA DEL CURSOR Y EL BOTON ---
 
-    //METODO PARA AGREGAR EL EMPLEADO
+    // METODO PARA AGREGAR EL EMPLEADO
     private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
         try {
+            
             String dni = this.txtDni.getText().toUpperCase();
             String nombre = this.txtNombre.getText().toUpperCase();
             int edad = (int)this.spnEdad.getValue();
             String telefono = this.txtTelefono.getText();
-
-            if ((this.controladorEmpleados.comprobarCamposEmpleado_C(dni, nombre, telefono)) && !(this.controladorEmpleados.dniExistente(dni)) &&
-                    !(this.controladorEmpleados.telefonoExistente(telefono))) {
-
-                if (this.tablaEmpresas.getSelectedRow() != -1) {
-                    Date fechaActual = new Date();
-                    Empresas_Object empresa = this.controladorEmpresa.obtenerEmpresa_C((int) this.tablaEmpresas.getValueAt(this.tablaEmpresas.getSelectedRow(), 0));
-                    Empleados_Object empleado = new Empleados_Object(dni, nombre, edad, Integer.parseInt(telefono), fechaActual, empresa);
-                    this.controladorEmpleados.guardarEmpleado_C(empleado);
-                    this.txtDni.setText("");
-                    this.txtNombre.setText("");
-                    this.txtTelefono.setText("");
-                    this.tablaEmpresas.clearSelection();
-                    this.dispose();
-                    this.vistaE.cargarDatosTabla("");
-                } else {
-                    JOptionPane.showMessageDialog(null, "TIENES QUE SELECCIONAR UNA EMPRESA DE LA TABLA", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
-                }
-
-            } else {
-                JOptionPane.showMessageDialog(null, "DNI O TELEFONO YA EXISTENTE O ERROR EN ALGUN CAMPO", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
-            }
+            
+            if(Validaciones.validarEmpleado(dni, nombre, telefono)){
+                
+                this.controladorEmpleados.verificarDniYTelefono(dni, telefono).thenAccept(verificacion -> {
+                
+                    if(!verificacion[0] && !verificacion[1]){
+                        
+                        if (this.tablaEmpresas.getSelectedRow() != -1) {
+                            Date fechaActual = new Date();
+                            this.controladorEmpresa.obtenerEmpresa_C((int) this.tablaEmpresas.getValueAt(this.tablaEmpresas.getSelectedRow(), 0)).thenAccept(empresa -> {
+                            
+                                if(empresa != null){
+                                    
+                                    Empleados_Object empleado = new Empleados_Object(dni, nombre, edad, Integer.parseInt(telefono), fechaActual, empresa);
+                                    this.controladorEmpleados.guardarEmpleado_C(empleado).thenRun(() -> {
+                                        this.vistaE.cargarDatosTabla("");
+                                    }).exceptionally(ex -> {
+                                        return null;
+                                    });
+                                    this.txtDni.setText("");
+                                    this.txtNombre.setText("");
+                                    this.txtTelefono.setText("");
+                                    this.tablaEmpresas.clearSelection();
+                                    this.dispose();
+                                                                        
+                                }
+                                
+                            }).exceptionally(ex -> {
+                                return null;
+                            });
+                            
+                        } else {
+                            JOptionPane.showMessageDialog(null, "TIENES QUE SELECCIONAR UNA EMPRESA DE LA TABLA", "AGREGAR EMPLEADO", JOptionPane.INFORMATION_MESSAGE);
+                        }
+                        
+                    }else{
+                       JOptionPane.showMessageDialog(null, "DNI O TELEFONO YA EXISTENTE", "AGREGAR EMPLEADO", JOptionPane.INFORMATION_MESSAGE); 
+                    }
+                
+                }).exceptionally(ex -> {
+                    return null;
+                });
+                
+            }else{
+                JOptionPane.showMessageDialog(null, "HAS INTRODUCIDO UN DATO ERRONEO", "AGREGAR EMPLEADO", JOptionPane.INFORMATION_MESSAGE);
+            }               
 
         } catch (HeadlessException | NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "ERROR EN ALGUN CAMPO", "INFORMACION", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "HAS INTRODUCIDO UN DATO ERRONEO", "AGREGAR EMPLEADO", JOptionPane.ERROR_MESSAGE);
         }
 
     }//GEN-LAST:event_btnAgregarActionPerformed
 
-    //METODO PARA CUANDO SE CIERRA LA VENTANA
+    // METODO PARA CUANDO SE CIERRA LA VENTANA
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
         this.txtDni.setText("");
         this.txtNombre.setText("");

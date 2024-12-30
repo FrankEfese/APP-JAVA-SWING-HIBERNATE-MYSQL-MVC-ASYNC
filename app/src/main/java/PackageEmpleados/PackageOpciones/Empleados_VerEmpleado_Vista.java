@@ -1,45 +1,65 @@
 package PackageEmpleados.PackageOpciones;
 
-import PackageEmpleados.Empleados_Object;
-import PackageEmpresas.Empresas_Controlador;
+import PackageEmpleados.Empleados_Controlador;
 import java.text.SimpleDateFormat;
 
 public class Empleados_VerEmpleado_Vista extends javax.swing.JFrame {
 
-    //OBJETO CONTROLADOR DE EMPRESA
-    private final Empresas_Controlador controladorEmpresa = new Empresas_Controlador();
+    // VARIABLE ID-EMPLEADO
+    private int idEmpleado;
+    
+    // CONTROLADOR-EMPLEADOS
+    private final Empleados_Controlador controladorEmpleado = new Empleados_Controlador();
 
-    //OBJETO EMPLEADO
-    Empleados_Object empleado;
-
-    //CONSTRUCTOR
-    public Empleados_VerEmpleado_Vista(Empleados_Object empleado) {
+    // CONSTRUCTOR
+    public Empleados_VerEmpleado_Vista(int idEmpleado) {
         initComponents();
         this.setLocationRelativeTo(null);
-        this.empleado = empleado;
-        //LAMAMOS AL METODO PARA CARGAR LOS DATOS
-        cargarDatos(this.empleado);
+        
+        // APLICAMOS EL ID-EMPLEADO
+        this.idEmpleado = idEmpleado;
+        
+        // LAMAMOS AL METODO PARA CARGAR LOS DATOS
+        cargarDatos();
     }
 
-    //METODO PARA CARGAR LOS DATOS DEL EMPLEADO
-    public void cargarDatos(Empleados_Object empleado) {
+    // GETTER
+    public int getIdEmpleado() {
+        return idEmpleado;
+    }
 
-        this.empleado = empleado;
+    // SETTER
+    public void setIdEmpleado(int idEmpleado) {
+        this.idEmpleado = idEmpleado;
+    }
+    
+    // METODO PARA CARGAR LOS DATOS DEL EMPLEADO
+    public void cargarDatos() {
 
-        //APLICAMOS LA INFORMACION PRINCIPAL DEL EMPLEADO
-        this.txtDni.setText("DNI : " + this.empleado.getDni());
-        this.txtNombre.setText("NOMBRE : " + this.empleado.getNombre());
-        this.txtEdad.setText("EDAD : " + this.empleado.getEdad());
-        this.txtTelefono.setText("TELEFONO : " + this.empleado.getTelefono());
+        this.controladorEmpleado.obtenerEmpleado_C(idEmpleado).thenAccept(empleado -> {
+            
+            if(empleado != null){
+                
+                //APLICAMOS LA INFORMACION PRINCIPAL DEL EMPLEADO
+                this.txtDni.setText("DNI : " + empleado.getDni());
+                this.txtNombre.setText("NOMBRE : " + empleado.getNombre());
+                this.txtEdad.setText("EDAD : " + empleado.getEdad());
+                this.txtTelefono.setText("TELEFONO : " + empleado.getTelefono());
 
-        if (this.empleado.getEmpresas_id_empresa() != null) {
-            this.txtEmpresa.setText("EMPRESA : " + this.controladorEmpresa.obtenerEmpresa_C(this.empleado.getEmpresas_id_empresa().getId_empresa()).getNombre());
-        } else {
-            this.txtEmpresa.setText("EMPRESA : SIN TRABAJO");
-        }
+                if (empleado.getEmpresas_id_empresa() != null) {
+                    this.txtEmpresa.setText("EMPRESA : " + empleado.getEmpresas_id_empresa().getNombre());
+                } else {
+                    this.txtEmpresa.setText("EMPRESA : SIN TRABAJO");
+                }
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-        this.txtF_Alta.setText("FECHA ALTA : " + dateFormat.format(this.empleado.getF_alta()));
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+                this.txtF_Alta.setText("FECHA ALTA : " + dateFormat.format(empleado.getF_alta()));
+                
+            }
+                    
+        }).exceptionally(ex ->{       
+            return null;
+        });
 
     }
 

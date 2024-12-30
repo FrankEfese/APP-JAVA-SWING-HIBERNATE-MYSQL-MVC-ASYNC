@@ -7,32 +7,33 @@ import PackageEmpresas.*;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.text.SimpleDateFormat;
-import java.util.List;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
 public class Empleados_Vista extends javax.swing.JPanel {
 
-    //OBJETO DEL CONTROLADOR DE EMPLEADOS Y EMPRESAS 
+    // CONTROLADOR DE EMPLEADOS Y EMPRESAS
     private final Empleados_Controlador controladorEmpleados = new Empleados_Controlador();
     private final Empresas_Controlador controladorEmpresas = new Empresas_Controlador();
 
-    //MODELO DE LA TABLA
+    // MODELO DE LA TABLA
     private DefaultTableModel modelo;
 
-    //VISTAS DE OPCIONES
+    // VARIABLES VISTAS-OPCIONES
     private Empleados_Agregar_Vista agregarEmpleadoVista;
     private Empleados_VerEmpleado_Vista verEmpleadoVista;
     private Empleados_Actualizar_Vista actualizarEmpleadoVista;
     
-    //CONSTRUCTOR
+    // CONSTRUCTOR
     public Empleados_Vista() {
         initComponents();
-        //LLAMAMOS AL METODO PARA CARGAR LOS DATOS EN LA TABLA
+        
+        // LLAMAMOS AL METODO PARA CARGAR LOS DATOS EN LA TABLA
         cargarDatosTabla("");
     }
 
-    //COMPONENTES DE LA INTERFAZ
+    // COMPONENTES DE LA INTERFAZ
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -322,49 +323,30 @@ public class Empleados_Vista extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    //METODO PARA CARGAR LOS DATOS DE LOS EMPLEADOS EN LA TABLA
+    // METODO PARA CARGAR LOS DATOS DE LOS EMPLEADOS EN LA TABLA
     public void cargarDatosTabla(String texto) {
 
-        //SE APLICA LAS COLUMNAS
+        // DESHABILITAMOS LA TABLA TEMPORALMENTE
+        this.tablaEmpleados.setEnabled(false);
+
+        // SE APLICA LAS COLUMNAS
         String columnas[] = {"ID", "DNI", "NOMBRE", "EDAD", "TELEFONO", "EMPRESA", "FECHA ALTA"};
         this.modelo = new DefaultTableModel(columnas, 0);
 
-        //FORMATO FECHA
+        // LIMPIAMOS LA TABLA
+        this.modelo.setRowCount(0);
+
+        // FORMATO FECHA
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 
-        //OBTENEMOS LOS EMPLEADOS
-        List<Empleados_Object> listaEmpleados = this.controladorEmpleados.obtenerTodosEmpleados_C();
+        // OBTENEMOS LOS EMPLEADOS
+        this.controladorEmpleados.obtenerTodosEmpleados_C().thenAccept(listaEmpleados -> {
 
-        //APLICAMOS EL TOTAL DE EMPLEADOS
-        this.txtTotalEmpleados.setText("* Total de Empleados : " + listaEmpleados.size());
+            if (texto.isEmpty()) {
 
-        if (texto.isEmpty()) {
-
-            //CARGAMOS TODOS LOS DATOS           
-            Object arrayObjetos[] = new Object[7];
-            for (Empleados_Object aux : listaEmpleados) {
-                arrayObjetos[0] = aux.getId_empleado();
-                arrayObjetos[1] = aux.getDni();
-                arrayObjetos[2] = aux.getNombre();
-                arrayObjetos[3] = aux.getEdad();
-                arrayObjetos[4] = aux.getTelefono();
-                if (aux.getEmpresas_id_empresa() == null) {
-                    arrayObjetos[5] = "SIN TRABAJO";
-                } else {
-                    arrayObjetos[5] = this.controladorEmpresas.obtenerEmpresa_C(aux.getEmpresas_id_empresa().getId_empresa()).getNombre();
-                }
-                arrayObjetos[6] = dateFormat.format(aux.getF_alta());
-                this.modelo.addRow(arrayObjetos);
-            }
-
-            this.tablaEmpleados.setModel(this.modelo);
-
-        } else {
-
-            //CARGAMOS LOS DATOS QUE CONTENGAN EL TEXTO INTRODUCIDO EN EL FILTRO           
-            Object arrayObjetos[] = new Object[7];
-            for (Empleados_Object aux : listaEmpleados) {
-                if (aux.getNombre().contains(texto.toUpperCase())) {
+                // CARGAMOS TODOS LOS DATOS           
+                Object arrayObjetos[] = new Object[7];
+                for (Empleados_Object aux : listaEmpleados) {
                     arrayObjetos[0] = aux.getId_empleado();
                     arrayObjetos[1] = aux.getDni();
                     arrayObjetos[2] = aux.getNombre();
@@ -373,124 +355,178 @@ public class Empleados_Vista extends javax.swing.JPanel {
                     if (aux.getEmpresas_id_empresa() == null) {
                         arrayObjetos[5] = "SIN TRABAJO";
                     } else {
-                        arrayObjetos[5] = this.controladorEmpresas.obtenerEmpresa_C(aux.getEmpresas_id_empresa().getId_empresa()).getNombre();
+                        arrayObjetos[5] = aux.getEmpresas_id_empresa().getNombre();
                     }
                     arrayObjetos[6] = dateFormat.format(aux.getF_alta());
                     this.modelo.addRow(arrayObjetos);
                 }
 
-                this.tablaEmpleados.setModel(this.modelo);
+                SwingUtilities.invokeLater(() -> {
+                    this.tablaEmpleados.setModel(modelo);
+                    this.tablaEmpleados.setEnabled(true);
+                    this.txtTotalEmpleados.setText("* Total de Empleados : " + this.tablaEmpleados.getRowCount());
+                });
+
+            } else {
+
+                // CARGAMOS LOS DATOS QUE CONTENGAN EL TEXTO INTRODUCIDO EN EL FILTRO           
+                Object arrayObjetos[] = new Object[7];
+                for (Empleados_Object aux : listaEmpleados) {
+                    if (aux.getNombre().contains(texto.toUpperCase())) {
+                        arrayObjetos[0] = aux.getId_empleado();
+                        arrayObjetos[1] = aux.getDni();
+                        arrayObjetos[2] = aux.getNombre();
+                        arrayObjetos[3] = aux.getEdad();
+                        arrayObjetos[4] = aux.getTelefono();
+                        if (aux.getEmpresas_id_empresa() == null) {
+                            arrayObjetos[5] = "SIN TRABAJO";
+                        } else {
+                            arrayObjetos[5] = aux.getEmpresas_id_empresa().getNombre();
+                        }
+                        arrayObjetos[6] = dateFormat.format(aux.getF_alta());
+                        this.modelo.addRow(arrayObjetos);
+                    }
+
+                }
+                SwingUtilities.invokeLater(() -> {
+                    this.tablaEmpleados.setModel(modelo);
+                    this.tablaEmpleados.setEnabled(true);
+                    this.txtTotalEmpleados.setText("* Total de Empleados : " + this.tablaEmpleados.getRowCount());
+                });
             }
-        }
+
+        });
     }
 
-    // --- METODOS PARA CAMBIAR LA ESTETICA DEL CURSOR Y EL BOTON ---
+    // METODO-ESTETICO
     private void btnVerEmpleadoMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnVerEmpleadoMouseEntered
         this.btnVerEmpleado.setBackground(Color.GRAY);
         this.btnVerEmpleado.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }//GEN-LAST:event_btnVerEmpleadoMouseEntered
 
+    // METODO-ESTETICO
     private void btnVerEmpleadoMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnVerEmpleadoMouseExited
         this.btnVerEmpleado.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnVerEmpleadoMouseExited
 
+    // METODO-ESTETICO
     private void btnAgregarEmpleadoMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnAgregarEmpleadoMouseEntered
         this.btnAgregarEmpleado.setBackground(Color.GRAY);
         this.btnAgregarEmpleado.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }//GEN-LAST:event_btnAgregarEmpleadoMouseEntered
 
+    // METODO-ESTETICO
     private void btnAgregarEmpleadoMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnAgregarEmpleadoMouseExited
         this.btnAgregarEmpleado.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnAgregarEmpleadoMouseExited
 
+    // METODO-ESTETICO
     private void btnActualizarEmpleadoMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnActualizarEmpleadoMouseEntered
         this.btnActualizarEmpleado.setBackground(Color.GRAY);
         this.btnActualizarEmpleado.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }//GEN-LAST:event_btnActualizarEmpleadoMouseEntered
 
+    // METODO-ESTETICO
     private void btnActualizarEmpleadoMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnActualizarEmpleadoMouseExited
         this.btnActualizarEmpleado.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnActualizarEmpleadoMouseExited
 
+    // METODO-ESTETICO
     private void btnEliminarEmpleadoMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEliminarEmpleadoMouseEntered
         this.btnEliminarEmpleado.setBackground(Color.GRAY);
         this.btnEliminarEmpleado.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }//GEN-LAST:event_btnEliminarEmpleadoMouseEntered
 
+    // METODO-ESTETICO
     private void btnEliminarEmpleadoMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEliminarEmpleadoMouseExited
         this.btnEliminarEmpleado.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnEliminarEmpleadoMouseExited
 
+    // METODO-ESTETICO
     private void btnReinicioMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnReinicioMouseEntered
         this.btnReinicio.setBackground(Color.GRAY);
         this.btnReinicio.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }//GEN-LAST:event_btnReinicioMouseEntered
 
+    // METODO-ESTETICO
     private void btnReinicioMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnReinicioMouseExited
         this.btnReinicio.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnReinicioMouseExited
-    // --- METODOS PARA CAMBIAR LA ESTETICA DEL CURSOR Y EL BOTON ---
 
-    //METODO PARA EL FILTRO DE BUSQUEDA
+    // METODO PARA EL FILTRO DE BUSQUEDA
     private void txtFiltroKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtFiltroKeyReleased
         String texto = this.txtFiltro.getText();
         cargarDatosTabla(texto);
     }//GEN-LAST:event_txtFiltroKeyReleased
 
-    //METODO PARA REINICIAR EL FILTRO Y RECARGAR LA TABLA
+    // METODO PARA REINICIAR EL FILTRO Y RECARGAR LA TABLA
     private void btnReinicioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReinicioActionPerformed
         this.txtFiltro.setText("");
         cargarDatosTabla("");
     }//GEN-LAST:event_btnReinicioActionPerformed
-
     
     //METODO PARA ELIMINAR A UN EMPLEADO
     private void btnEliminarEmpleadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarEmpleadoActionPerformed
         if (this.tablaEmpleados.getSelectedRow() != -1) {
-            int respuesta = JOptionPane.showConfirmDialog(null, "¿DESEAS ELIMINAR EL EMPLEADO SELECCIONADO?", "INFORMACION", JOptionPane.YES_NO_OPTION);
+            int respuesta = JOptionPane.showConfirmDialog(null, "¿DESEAS ELIMINAR EL EMPLEADO SELECCIONADO?", "EMPLEADOS", JOptionPane.YES_NO_OPTION);
             if (respuesta == JOptionPane.YES_OPTION) {
                 int idEmpleado = (int) this.tablaEmpleados.getValueAt(this.tablaEmpleados.getSelectedRow(), 0);
-                this.controladorEmpleados.eliminarEmpleado_C(idEmpleado);
-                cargarDatosTabla("");
+                this.controladorEmpleados.eliminarEmpleado_C(idEmpleado).thenRun(() -> {
+                    cargarDatosTabla("");
+                }).exceptionally(ex -> {
+                    return null;
+                });
+
+                if (this.verEmpleadoVista != null && this.verEmpleadoVista.getIdEmpleado() == idEmpleado) {
+                    this.verEmpleadoVista.dispose();
+                }
+
+                if (this.actualizarEmpleadoVista != null && this.actualizarEmpleadoVista.getEmpleado().getId_empleado() == idEmpleado) {
+                    this.actualizarEmpleadoVista.dispose();
+                }
             }
 
         } else {
-            JOptionPane.showMessageDialog(null, "DEBES SELECCIONAR UNA FILA DE LA TABLA", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "DEBES SELECCIONAR UNA FILA DE LA TABLA", "EMPLEADOS", JOptionPane.INFORMATION_MESSAGE);
         }
     }//GEN-LAST:event_btnEliminarEmpleadoActionPerformed
 
     //METODO PARA ABRIR LA PESTAÑA QUE PERMITE AGREGAR LOS EMPLEADOS
     private void btnAgregarEmpleadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarEmpleadoActionPerformed
-        if (!this.controladorEmpresas.obtenerTodasEmpresas_C().isEmpty()) {
-            if (this.agregarEmpleadoVista == null) {
-                this.agregarEmpleadoVista = new Empleados_Agregar_Vista(this);
-                this.agregarEmpleadoVista.setVisible(true);
+        this.controladorEmpresas.totalEmpresas().thenAccept(total -> {
+            if (total > 0) {
+
+                if (this.agregarEmpleadoVista == null) {
+                    this.agregarEmpleadoVista = new Empleados_Agregar_Vista(this);
+                    this.agregarEmpleadoVista.setVisible(true);
+                } else {
+                    this.agregarEmpleadoVista.setVisible(true);
+                }
+
             } else {
-                this.agregarEmpleadoVista.setVisible(true);
+                JOptionPane.showMessageDialog(null, "AUN NO HAY EMPRESAS DISPONIBLES QUE APLICAR AL EMPLEADO", "EMPLEADOS", JOptionPane.INFORMATION_MESSAGE);
             }
-        } else {
-            JOptionPane.showMessageDialog(null, "AUN NO HAY EMPRESAS DISPONIBLES QUE APLICAR AL EMPLEADO", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
-        }
+        });
     }//GEN-LAST:event_btnAgregarEmpleadoActionPerformed
 
     //METODO PARA ABRIR LA PESTAÑA QUE PERMITE VER LOS DATOS DE LOS EMPLEADOS
     private void btnVerEmpleadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerEmpleadoActionPerformed
-        if(this.tablaEmpleados.getSelectedRow() != -1){
-            
-            Empleados_Object empleado = this.controladorEmpleados.obtenerEmpleado_C((int) this.tablaEmpleados.getValueAt(this.tablaEmpleados.getSelectedRow(), 0));
-            if (empleado != null) {
+        if (this.tablaEmpleados.getSelectedRow() != -1) {
+            int idEmpleado = (int) this.tablaEmpleados.getValueAt(this.tablaEmpleados.getSelectedRow(), 0);
+            if (idEmpleado > 0) {
 
                 if (this.verEmpleadoVista == null) {
-                    this.verEmpleadoVista = new Empleados_VerEmpleado_Vista(empleado);
+                    this.verEmpleadoVista = new Empleados_VerEmpleado_Vista(idEmpleado);
                     this.verEmpleadoVista.setVisible(true);
                 } else {
-                    this.verEmpleadoVista.cargarDatos(empleado);
+                    this.verEmpleadoVista.setIdEmpleado(idEmpleado);
+                    this.verEmpleadoVista.cargarDatos();
                     this.verEmpleadoVista.setVisible(true);
                 }
             }
-            
-        }else{
-            JOptionPane.showMessageDialog(null, "DEBES SELECCIONAR UNA FILA DE LA TABLA", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
+
+        } else {
+            JOptionPane.showMessageDialog(null, "DEBES SELECCIONAR UNA FILA DE LA TABLA", "EMPLEADOS", JOptionPane.INFORMATION_MESSAGE);
         }
     }//GEN-LAST:event_btnVerEmpleadoActionPerformed
 
@@ -498,25 +534,32 @@ public class Empleados_Vista extends javax.swing.JPanel {
     private void btnActualizarEmpleadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarEmpleadoActionPerformed
         if (this.tablaEmpleados.getSelectedRow() != -1) {
             int idEmpleado = (int) this.tablaEmpleados.getValueAt(this.tablaEmpleados.getSelectedRow(), 0);
-            Empleados_Object empleado = this.controladorEmpleados.obtenerEmpleado_C(idEmpleado);
 
-            if (empleado != null) {
-                int indice = this.controladorEmpresas.obtenerFilaTabla(empleado.getEmpresas_id_empresa());
-                if (this.actualizarEmpleadoVista == null) {
-                    this.actualizarEmpleadoVista = new Empleados_Actualizar_Vista(this, empleado, indice);
-                    this.actualizarEmpleadoVista.setVisible(true);
-                } else {
-                    this.actualizarEmpleadoVista.cargarDatos(empleado, indice);
-                    this.actualizarEmpleadoVista.setVisible(true);
+            this.controladorEmpleados.obtenerEmpleado_C(idEmpleado).thenAccept(empleado -> {
+
+                if (empleado != null) {
+                    this.controladorEmpresas.obtenerFilaTabla(empleado.getEmpresas_id_empresa()).thenAccept(indice -> {
+
+                        if (this.actualizarEmpleadoVista == null) {
+                            this.actualizarEmpleadoVista = new Empleados_Actualizar_Vista(this, empleado, indice);
+                            this.actualizarEmpleadoVista.setVisible(true);
+                        } else {
+                            this.actualizarEmpleadoVista.setEmpleado(empleado);
+                            this.actualizarEmpleadoVista.setIndice(indice);
+                            this.actualizarEmpleadoVista.cargarDatos();
+                            this.actualizarEmpleadoVista.setVisible(true);
+                        }
+
+                    });
                 }
-            }
+            });
 
         } else {
-            JOptionPane.showMessageDialog(null, "DEBES SELECCIONAR UNA FILA DE LA TABLA", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "DEBES SELECCIONAR UNA FILA DE LA TABLA", "EMPLEADOS", JOptionPane.INFORMATION_MESSAGE);
         }
     }//GEN-LAST:event_btnActualizarEmpleadoActionPerformed
 
-    //METODO PARA CERRAR LAS VENTANAS
+    // METODO PARA CERRAR LAS VENTANAS
     public void eliminarVentanas(){
         
         if(this.verEmpleadoVista != null){
@@ -532,6 +575,17 @@ public class Empleados_Vista extends javax.swing.JPanel {
         }
     }
 
+    // METODO PARA ACTUALIZAR DATOS VENTANA-PRINCIPAL Y VENTANA VER-EMPLEADO
+    public void actualizarDatos(int idEmpleado){
+        
+        cargarDatosTabla("");
+        
+        if(this.verEmpleadoVista != null && this.verEmpleadoVista.getIdEmpleado() == idEmpleado){
+            this.verEmpleadoVista.setIdEmpleado(idEmpleado);
+            this.verEmpleadoVista.cargarDatos();
+        }
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnActualizarEmpleado;
     private javax.swing.JButton btnAgregarEmpleado;
