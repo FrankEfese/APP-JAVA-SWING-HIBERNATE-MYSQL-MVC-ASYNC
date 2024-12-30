@@ -14,11 +14,11 @@ import javax.swing.SwingUtilities;
 
 public class Principal_Vista extends javax.swing.JFrame {
 
-    //OBJETO CORREO ADMIN
-    public static String correoAdmin = "";
+    // VARIABLE CORREO DEL ADMINISTRADOR
+    public static String correoAdministrador = "";
 
-    //OBJETOS DE VISTA
-    private Login_Vista vistaLogin;
+    // VARIABLES-MENUS
+    private final Login_Vista vistaLogin;
     private Inicio_Vista vistaInicio;
     private Seguros_Vista vistaSeguro;
     private Empresas_Vista vistaEmpresa;
@@ -26,19 +26,19 @@ public class Principal_Vista extends javax.swing.JFrame {
     private Productos_Vista vistaProductos;
     private Administracion_Vista vistaAdmin;
 
-    //CARD DONDE SE COLOCARAN LAS VISTAS DE LAS OPCIONES
+    // CARD DONDE SE COLOCARAN LAS VISTAS-MENUS
     private final CardLayout opciones;
 
-    //CONSTRUCTOR
+    // CONSTRUCTOR
     public Principal_Vista(Login_Vista vistaLogin) {
         initComponents();
         this.setLocationRelativeTo(null);
         this.opciones = (CardLayout) this.pnlVistas.getLayout();
         
-        //APLICAMOS LA VISTA LOGIN
+        // APLICAMOS LA VISTA-LOGIN
         this.vistaLogin = vistaLogin;
 
-        //APLICAMOS LA PESTAÑA INICIO COMO LA PRINCIPAL
+        // APLICAMOS LA VISTA-INICIO COMO LA INICIAL
         this.vistaInicio = new Inicio_Vista();
         this.pnlVistas.add(this.vistaInicio, "vistaInicio");
         this.opciones.show(this.pnlVistas, "vistaInicio");
@@ -46,7 +46,7 @@ public class Principal_Vista extends javax.swing.JFrame {
         this.repaint();
     }
 
-    //COMPONENTES DE LA INTERFAZ
+    // COMPONENTES DE LA INTERFAZ
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -356,71 +356,80 @@ public class Principal_Vista extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    //--- METODOS ---
-    // --- METODO PARA CAMBIAR LA ESTETICA DEL CURSOR Y EL BOTON ---
+    // METODO-ESTETICO
     private void btnInicioPMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnInicioPMouseEntered
         this.btnInicioP.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         this.btnInicioP.setBackground(Color.GRAY);
     }//GEN-LAST:event_btnInicioPMouseEntered
 
+    // METODO-ESTETICO
     private void btnInicioPMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnInicioPMouseExited
         this.btnInicioP.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnInicioPMouseExited
 
+    // METODO-ESTETICO
     private void btnSegurosMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnSegurosMouseEntered
         this.btnSeguros.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         this.btnSeguros.setBackground(Color.GRAY);
     }//GEN-LAST:event_btnSegurosMouseEntered
 
+    // METODO-ESTETICO
     private void btnSegurosMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnSegurosMouseExited
         this.btnSeguros.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnSegurosMouseExited
 
+    // METODO-ESTETICO
     private void btnEmpresasMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEmpresasMouseEntered
         this.btnEmpresas.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         this.btnEmpresas.setBackground(Color.GRAY);
     }//GEN-LAST:event_btnEmpresasMouseEntered
 
+    // METODO-ESTETICO
     private void btnEmpresasMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEmpresasMouseExited
         this.btnEmpresas.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnEmpresasMouseExited
 
+    // METODO-ESTETICO
     private void btnEmpleadosMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEmpleadosMouseEntered
         this.btnEmpleados.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         this.btnEmpleados.setBackground(Color.GRAY);
     }//GEN-LAST:event_btnEmpleadosMouseEntered
 
+    // METODO-ESTETICO
     private void btnEmpleadosMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEmpleadosMouseExited
         this.btnEmpleados.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnEmpleadosMouseExited
 
+    // METODO-ESTETICO
     private void btnProductosMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnProductosMouseEntered
         this.btnProductos.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         this.btnProductos.setBackground(Color.GRAY);
     }//GEN-LAST:event_btnProductosMouseEntered
 
+    // METODO-ESTETICO
     private void btnProductosMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnProductosMouseExited
         this.btnProductos.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnProductosMouseExited
 
+    // METODO-ESTETICO
     private void btnSalirMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnSalirMouseEntered
         this.btnSalir.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         this.btnSalir.setBackground(Color.GRAY);
     }//GEN-LAST:event_btnSalirMouseEntered
 
+    // METODO-ESTETICO
     private void btnSalirMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnSalirMouseExited
         this.btnSalir.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnSalirMouseExited
-    // --- METODO PARA CAMBIAR LA ESTETICA DEL CURSOR Y EL BOTON ---
 
-    //METODO PARA SALIR DE LA VISTA PRINCIPAL Y VOLVER AL LOGIN
+    // METODO PARA SALIR DE LA VISTA PRINCIPAL , CERRAR TODAS LAS VISTAS Y VOLVER AL LOGIN
     private void btnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalirActionPerformed
         eliminarVistas();
         this.vistaLogin.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_btnSalirActionPerformed
 
-    //METODO PARA SELECCIONAR LA VISTA SEGUROS
+    // METODO PARA SELECCIONAR LA VISTA SEGUROS
     private void btnSegurosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSegurosActionPerformed
         eliminarVistas();
         this.vistaSeguro = new Seguros_Vista();
@@ -430,7 +439,7 @@ public class Principal_Vista extends javax.swing.JFrame {
         this.repaint();
     }//GEN-LAST:event_btnSegurosActionPerformed
 
-    //METODO PARA SELECCIONAR LA VISTA EMPRESAS
+    // METODO PARA SELECCIONAR LA VISTA EMPRESAS
     private void btnEmpresasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEmpresasActionPerformed
         eliminarVistas();
         this.vistaEmpresa = new Empresas_Vista();
@@ -440,7 +449,7 @@ public class Principal_Vista extends javax.swing.JFrame {
         this.repaint();
     }//GEN-LAST:event_btnEmpresasActionPerformed
 
-    //METODO PARA SELECCIONAR LA VISTA EMPLEADOS
+    // METODO PARA SELECCIONAR LA VISTA EMPLEADOS
     private void btnEmpleadosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEmpleadosActionPerformed
         eliminarVistas();
         this.vistaEmpleados = new Empleados_Vista();
@@ -450,7 +459,7 @@ public class Principal_Vista extends javax.swing.JFrame {
         this.repaint();
     }//GEN-LAST:event_btnEmpleadosActionPerformed
 
-    //METODO PARA SELECCIONAR LA VISTA PRODUCTOS
+    // METODO PARA SELECCIONAR LA VISTA PRODUCTOS
     private void btnProductosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProductosActionPerformed
         eliminarVistas();
         this.vistaProductos = new Productos_Vista();
@@ -460,7 +469,7 @@ public class Principal_Vista extends javax.swing.JFrame {
         this.repaint();
     }//GEN-LAST:event_btnProductosActionPerformed
 
-    //METODO PARA SELECCIONAR LA VISTA INICIO
+    // METODO PARA SELECCIONAR LA VISTA INICIO
     private void btnInicioPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInicioPActionPerformed
         eliminarVistas();
         this.vistaInicio = new Inicio_Vista();
@@ -470,18 +479,18 @@ public class Principal_Vista extends javax.swing.JFrame {
         this.repaint();
     }//GEN-LAST:event_btnInicioPActionPerformed
 
-    // --- METODO PARA CAMBIAR LA ESTETICA DEL CURSOR Y EL BOTON ---
+    // METODO-ESTETICO
     private void btnAdminMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnAdminMouseEntered
         this.btnAdmin.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         this.btnAdmin.setBackground(Color.GRAY);
     }//GEN-LAST:event_btnAdminMouseEntered
 
+    // METODO-ESTETICO
     private void btnAdminMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnAdminMouseExited
         this.btnAdmin.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnAdminMouseExited
-    // --- METODO PARA CAMBIAR LA ESTETICA DEL CURSOR Y EL BOTON ---
 
-    //METODO PARA SELECCIONAR LA VISTA ADMINISTRADORES
+    // METODO PARA SELECCIONAR LA VISTA ADMINISTRADORES
     private void btnAdminActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAdminActionPerformed
         eliminarVistas();
         this.vistaAdmin = new Administracion_Vista();
@@ -491,14 +500,14 @@ public class Principal_Vista extends javax.swing.JFrame {
         this.repaint();
     }//GEN-LAST:event_btnAdminActionPerformed
 
-    //METODO PARA VOLVER A MOSTRAR EL LOGIN CUANDO SE CIERRE EL MENU PRINCIPAL Y CERRAR TODAS LAS VENTANAS
+    // METODO PARA VOLVER A MOSTRAR EL LOGIN CUANDO SE CIERRE EL MENU PRINCIPAL Y CERRAR TODAS LAS VENTANAS
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         eliminarVistas();
         this.vistaLogin.setVisible(true);
         this.dispose(); 
     }//GEN-LAST:event_formWindowClosing
 
-    //METODO PARA ELIMINAR TODAS LAS VISTAS
+    // METODO PARA ELIMINAR TODAS LAS VISTAS
     private void eliminarVistas(){
         
         this.pnlVistas.removeAll();

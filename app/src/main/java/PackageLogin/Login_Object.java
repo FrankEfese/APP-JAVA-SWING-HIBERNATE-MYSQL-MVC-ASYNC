@@ -7,6 +7,7 @@ import javax.persistence.*;
 @Table(name = "login")
 public class Login_Object implements Serializable {
 
+    // ATRIBUTOS
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id_login")
@@ -18,24 +19,24 @@ public class Login_Object implements Serializable {
     @Column(name = "contraseña", nullable = false)
     private String contraseña;
 
-    //CONSTRUCTOR
+    // CONSTRUCTOR
     public Login_Object() {
     }
 
-    //CONSTRUCTOR
+    // CONSTRUCTOR
     public Login_Object(int id_Login, String correo, String contraseña) {
         this.id_login = id_Login;
         this.correo = correo;
         this.contraseña = contraseña;
     }
 
-    //CONSTRUCTOR
+    // CONSTRUCTOR
     public Login_Object(String correo, String contraseña) {
         this.correo = correo;
         this.contraseña = contraseña;
     }
 
-    //GETTER AND SETTERS
+    // GETTERS AND SETTERS
     public int getId_login() {
         return id_login;
     }
@@ -60,7 +61,7 @@ public class Login_Object implements Serializable {
         this.contraseña = contraseña;
     }
 
-    //TO STRING
+    // TO STRING
     @Override
     public String toString() {
         return "Login_Object{" + "id_Login=" + id_login + ", correo=" + correo + ", contrase\u00f1a=" + contraseña + '}';
