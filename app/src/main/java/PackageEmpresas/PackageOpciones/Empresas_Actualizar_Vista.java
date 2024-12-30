@@ -5,6 +5,7 @@ import PackageEmpresas.Empresas_Object;
 import PackageEmpresas.Empresas_Vista;
 import PackageSeguros.Seguros_Controlador;
 import PackageSeguros.Seguros_Object;
+import PackageTools.Validaciones;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.HeadlessException;
@@ -14,70 +15,101 @@ import javax.swing.table.DefaultTableModel;
 
 public class Empresas_Actualizar_Vista extends javax.swing.JFrame {
 
-    //OBJETOS DEL CONTROLADOR DE EMPRESA Y SEGURO
+    // CONTROLADOR DE EMPRESA Y SEGURO
     private final Empresas_Controlador controladorEmpresa = new Empresas_Controlador();
     private final Seguros_Controlador controladorSeguro = new Seguros_Controlador();
 
-    //OBJETO DE LA VISTA EMPRESA PRINCIPAL
+    // VARIABLE VISTA-EMPRESA PRINCIPAL 
     private final Empresas_Vista vistaE;
 
-    //OBJETO DE LA EMPRESA
+    // VARIABLE-EMPRESA
     private Empresas_Object empresa;
 
-    //OBJETO INDICE TABLA
+    // INDICE-TABLA
     private int indice;
 
-    //MODELO DE LA TABLA
+    // MODELO DE LA TABLA
     private DefaultTableModel modelo;
 
-    //CONSTRUCTOR
+    // CONSTRUCTOR
     public Empresas_Actualizar_Vista(Empresas_Vista vistaEmpresa, Empresas_Object empresa, int indice) {
         initComponents();
         this.setLocationRelativeTo(null);
+        
+        // APLICAMOS LAS VARIABLES EMPRESA
         this.vistaE = vistaEmpresa;
         this.empresa = empresa;
+        
+        // APLICAMOS EL INDICE-TABLA
         this.indice = indice;
 
-        //CARGAMOS LOS SEGUROS
-        cargarDatos(this.empresa, this.indice);
+        // CARGAMOS LOS SEGUROS
+        cargarDatos();
+    }
+    
+    // GETTERS AND SETTERS
+    public Empresas_Object getEmpresa() {
+        return empresa;
     }
 
-    //METODO PARA CARGAR LOS SEGUROS EN LA TABLA Y LOS DATOS DE LA EMPRESA
-    public void cargarDatos(Empresas_Object empresa, int indice) {
-
+    public void setEmpresa(Empresas_Object empresa) {
         this.empresa = empresa;
-        this.indice = indice;
+    }
 
-        //CARGAMOS LOS DATOS DE LA EMPRESA
+    public int getIndice() {
+        return indice;
+    }
+
+    public void setIndice(int indice) {
+        this.indice = indice;
+    }
+
+    // METODO PARA CARGAR LOS SEGUROS EN LA TABLA Y LOS DATOS DE LA EMPRESA
+    public void cargarDatos() {
+
+        // CARGAMOS LOS DATOS DE LA EMPRESA
         this.txtIdEmp.setText(this.empresa.getId_empresarial());
         this.txtNombre.setText(this.empresa.getNombre());
         this.txtCiudad.setText(this.empresa.getCiudad());
 
-        //SE APLICA LAS COLUMNAS
+        // SE APLICA LAS COLUMNAS
         String columnas[] = {"ID", "NOMBRE"};
         this.modelo = new DefaultTableModel(columnas, 0);
+        
+        // LIMPIAMOS LA TABLA
+        this.modelo.setRowCount(0);
+        
+        // TOTAL DE SEGUROS
+        int totalSeguros = this.controladorSeguro.totalSeguros_C().join();
+        
+        if(totalSeguros != 0){
+            
+            // OBTENEMOS LOS SEGUROS
+            this.controladorSeguro.obtenerTodosSeguros_C().thenAccept(listaSeguros -> {
+            
+                // CARGAMOS TODOS LOS DATOS           
+                Object arrayObjetos[] = new Object[2];
+                for (Seguros_Object aux : listaSeguros) {
+                    arrayObjetos[0] = aux.getId_seguro();
+                    arrayObjetos[1] = aux.getNombre();
+                    this.modelo.addRow(arrayObjetos);
+                }
 
-        //OBTENEMOS LOS SEGUROS
-        List<Seguros_Object> listaSeguros = this.controladorSeguro.obtenerTodosSeguros_C();
+                this.tablaSeguros.setModel(this.modelo);
 
-        //CARGAMOS TODOS LOS DATOS           
-        Object arrayObjetos[] = new Object[2];
-        for (Seguros_Object aux : listaSeguros) {
-            arrayObjetos[0] = aux.getId_seguro();
-            arrayObjetos[1] = aux.getNombre();
-            this.modelo.addRow(arrayObjetos);
-        }
-
-        this.tablaSeguros.setModel(this.modelo);
-
-        //SELECCIONAMOS FILA DE LA TABLA
-        if (this.indice != -1) {
-            this.tablaSeguros.setRowSelectionInterval(this.indice, this.indice);
+                // SELECCIONAMOS FILA DE LA TABLA
+                if (this.indice != -1) {
+                    this.tablaSeguros.setRowSelectionInterval(this.indice, this.indice);
+                }
+                
+            }).exceptionally(ex ->{
+                return null;
+            });           
         }
 
     }
 
-    //COMPONENTES DE LA INTERFAZ
+    // COMPONENTES DE LA INTERFAZ
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -253,63 +285,89 @@ public class Empresas_Actualizar_Vista extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    // --- METODO PARA CAMBIAR LA ESTETICA DEL CURSOR Y EL BOTON ---
+    // METODO-ESTETICO
     private void btnActualizarMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnActualizarMouseEntered
         this.btnActualizar.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         this.btnActualizar.setBackground(Color.GRAY);
     }//GEN-LAST:event_btnActualizarMouseEntered
 
+    // METODO-ESTETICO
     private void btnActualizarMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnActualizarMouseExited
         this.btnActualizar.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnActualizarMouseExited
-    // --- METODO PARA CAMBIAR LA ESTETICA DEL CURSOR Y EL BOTON ---
 
-    //METODO PARA ACTUALIZAR LA EMPRESA
+    // METODO PARA ACTUALIZAR LA EMPRESA
     private void btnActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarActionPerformed
         try {
+            
             String idEmp = this.txtIdEmp.getText().toUpperCase();
             String nombre = this.txtNombre.getText().toUpperCase();
             String ciudad = this.txtCiudad.getText().toUpperCase();
-
-            if ((this.controladorEmpresa.comprobarCamposEmpresas_C(idEmp, nombre, ciudad)) && (!this.controladorEmpresa.idEmpresarialExistente(idEmp)
-                    || idEmp.equals(this.empresa.getId_empresarial()))) {
+            
+            if(Validaciones.validarEmpresa(idEmp, nombre, ciudad)){
                 
-                if (this.tablaSeguros.getRowCount() != 0) {
+                this.controladorEmpresa.idEmpresarialExistente(idEmp).thenAccept(existe -> {
+                
+                    if(!existe || idEmp.equals(this.empresa.getId_empresarial())){
+                        
+                        if (this.tablaSeguros.getRowCount() != 0) {
 
-                    if (this.tablaSeguros.getSelectedRow() != -1) {
-                        Seguros_Object seguro = this.controladorSeguro.obtenerSeguro_C((int) this.tablaSeguros.getValueAt(this.tablaSeguros.getSelectedRow(), 0));
-                        this.empresa.setId_empresarial(idEmp);
-                        this.empresa.setNombre(nombre);
-                        this.empresa.setCiudad(ciudad);
-                        this.empresa.setSeguros_id_seguro(seguro);
-                        this.controladorEmpresa.actualizarEmpresa_C(this.empresa);
-                        this.txtIdEmp.setText("");
-                        this.txtNombre.setText("");
-                        this.txtCiudad.setText("");
-                        this.dispose();
-                        this.vistaE.cargarDatosTabla("");
-                    } else {
-                        JOptionPane.showMessageDialog(null, "TIENES QUE SELECCIONAR UN SEGURO DE LA TABLA", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
+                            if (this.tablaSeguros.getSelectedRow() != -1) {
+                                
+                                this.controladorSeguro.obtenerSeguro_C((int) this.tablaSeguros.getValueAt(this.tablaSeguros.getSelectedRow(), 0)).thenAccept(seguro -> {
+                                    if(seguro != null){
+                                        this.empresa.setId_empresarial(idEmp);
+                                        this.empresa.setNombre(nombre);
+                                        this.empresa.setCiudad(ciudad);
+                                        this.empresa.setSeguros_id_seguro(seguro);
+                                        this.controladorEmpresa.actualizarEmpresa_C(this.empresa).thenRun(() -> {
+                                            this.vistaE.actualizarDatos(this.empresa.getId_empresa());
+                                        }).exceptionally(ex ->{
+                                            return null;
+                                        });
+                                        this.txtIdEmp.setText("");
+                                        this.txtNombre.setText("");
+                                        this.txtCiudad.setText("");
+                                        this.dispose();                                       
+                                    }
+                                                                      
+                                }).exceptionally(ex ->{
+                                    return null;
+                                });
+                                
+                            } else {
+                                JOptionPane.showMessageDialog(null, "TIENES QUE SELECCIONAR UN SEGURO DE LA TABLA", "ACTUALIZAR EMPRESA", JOptionPane.INFORMATION_MESSAGE);
+                            }
+
+                        } else {
+                            this.empresa.setId_empresarial(idEmp);
+                            this.empresa.setNombre(nombre);
+                            this.empresa.setCiudad(ciudad);
+                            this.controladorEmpresa.actualizarEmpresa_C(this.empresa).thenRun(() -> {
+                                this.vistaE.actualizarDatos(this.empresa.getId_empresa());
+                            }).exceptionally(ex ->{
+                                return null;
+                            });
+                            this.txtIdEmp.setText("");
+                            this.txtNombre.setText("");
+                            this.txtCiudad.setText("");
+                            this.dispose();                           
+                        }
+                        
+                    }else{
+                       JOptionPane.showMessageDialog(null, "ID EMPRESARIAL YA EXISTENTE", "ACTUALIZAR EMPRESA", JOptionPane.INFORMATION_MESSAGE); 
                     }
-
-                } else {
-                    this.empresa.setId_empresarial(idEmp);
-                    this.empresa.setNombre(nombre);
-                    this.empresa.setCiudad(ciudad);
-                    this.controladorEmpresa.actualizarEmpresa_C(this.empresa);
-                    this.txtIdEmp.setText("");
-                    this.txtNombre.setText("");
-                    this.txtCiudad.setText("");
-                    this.dispose();
-                    this.vistaE.cargarDatosTabla("");
-                }
-
-            } else {
-                JOptionPane.showMessageDialog(null, "ID EMPRESARIAL YA EXISTENTE O ERROR EN ALGUN CAMPO", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
+                
+                }).exceptionally(ex ->{
+                    return null;
+                });
+                
+            }else{
+                JOptionPane.showMessageDialog(null, "HAS INTRODUCIDO UN DATO ERRONEO", "ACTUALIZAR EMPRESA", JOptionPane.INFORMATION_MESSAGE);
             }
 
         } catch (HeadlessException | NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "ERROR EN ALGUN CAMPO", "INFORMACION", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "HAS INTRODUCIDO UN DATO ERRONEO", "ACTUALIZAR EMPRESA", JOptionPane.ERROR_MESSAGE);
         }
 
     }//GEN-LAST:event_btnActualizarActionPerformed

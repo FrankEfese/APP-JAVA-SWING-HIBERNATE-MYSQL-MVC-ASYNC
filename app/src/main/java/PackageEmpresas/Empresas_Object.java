@@ -12,6 +12,7 @@ import javax.persistence.*;
 @Table(name = "empresas")
 public class Empresas_Object implements Serializable {
 
+    // ATRIBUTOS
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id_empresa")
@@ -30,21 +31,24 @@ public class Empresas_Object implements Serializable {
     @Temporal(javax.persistence.TemporalType.DATE)
     private Date f_alta;
 
+    // RELACION 1 A MUCHOS CON SEGUROS
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "seguros_id_seguro", nullable = true)
     private Seguros_Object seguros_id_seguro;
     
+    // RELACION MUCHOS A 1 CON EMPLEADOS
     @OneToMany(mappedBy = "empresas_id_empresa", cascade = CascadeType.PERSIST)
     private List<Empleados_Object> empleados;
     
+    // RELACION MUCHOS A 1 CON PRODUCTOS
     @OneToMany(mappedBy = "empresas_id_empresa_p", cascade = CascadeType.REMOVE)
     private List<Productos_Object> productos;
 
-    //CONSTRUCTOR
+    // CONSTRUCTOR
     public Empresas_Object() {
     }
 
-    //CONSTRUCTOR
+    // CONSTRUCTOR
     public Empresas_Object(int id_empresa, String id_empresarial, String nombre, String ciudad, Date f_alta, Seguros_Object seguros_id_seguro) {
         this.id_empresa = id_empresa;
         this.id_empresarial = id_empresarial;
@@ -52,10 +56,9 @@ public class Empresas_Object implements Serializable {
         this.ciudad = ciudad;
         this.f_alta = f_alta;
         this.seguros_id_seguro = seguros_id_seguro;
-    }
-    
+    }    
 
-    //CONSTRUCTOR
+    // CONSTRUCTOR
     public Empresas_Object(String id_empresarial, String nombre, String ciudad, Date f_alta, Seguros_Object seguros_id_seguro) {    
         this.id_empresarial = id_empresarial;
         this.nombre = nombre;
@@ -64,7 +67,7 @@ public class Empresas_Object implements Serializable {
         this.seguros_id_seguro = seguros_id_seguro;
     }
 
-    //GETTERS AND SETTERS
+    // GETTERS AND SETTERS
     public int getId_empresa() {
         return id_empresa;
     }
@@ -79,8 +82,7 @@ public class Empresas_Object implements Serializable {
 
     public void setId_empresarial(String id_empresarial) {
         this.id_empresarial = id_empresarial;
-    }
-    
+    }   
 
     public String getCiudad() {
         return ciudad;
@@ -128,10 +130,9 @@ public class Empresas_Object implements Serializable {
 
     public void setProductos(List<Productos_Object> productos) {
         this.productos = productos;
-    }
-      
+    }    
 
-    //TO STRING
+    // TO STRING
     @Override
     public String toString() {
         return "Empresas_Object{" + "id_empresa=" + id_empresa + ", id_empresarial=" + id_empresarial + ", nombre=" + nombre + ", ciudad=" + ciudad + ", f_alta=" + f_alta + ", seguros_id_seguro=" + seguros_id_seguro + ", empleados=" + empleados + '}';

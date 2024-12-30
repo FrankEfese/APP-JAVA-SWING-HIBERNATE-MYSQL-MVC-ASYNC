@@ -95,5 +95,17 @@ public class Seguros_Modelo {
             return new ArrayList<>();
         }
     }
+    
+    // METODO PARA OBTENER EL TOTAL DE SEGUROS (MODELO)
+    public int obtenerTotalSeguros_M() {
+        try (Session session = sessionFactory.openSession()) {
+            Long total = session.createQuery("SELECT COUNT(*) FROM Seguros_Object", Long.class).uniqueResult();
+            return total != null ? total.intValue() : 0;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "ERROR AL OBTENER EL TOTAL DE SEGUROS", "SEGUROS-M", JOptionPane.ERROR_MESSAGE);
+            return 0;
+        }
+    }
+
 
 }

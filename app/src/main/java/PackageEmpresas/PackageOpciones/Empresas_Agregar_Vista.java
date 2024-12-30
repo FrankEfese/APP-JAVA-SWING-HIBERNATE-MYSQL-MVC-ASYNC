@@ -5,57 +5,74 @@ import PackageEmpresas.Empresas_Object;
 import PackageEmpresas.Empresas_Vista;
 import PackageSeguros.Seguros_Controlador;
 import PackageSeguros.Seguros_Object;
+import PackageTools.Validaciones;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.HeadlessException;
 import java.util.Date;
-import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 public class Empresas_Agregar_Vista extends javax.swing.JFrame {
 
-    //OBJETOS DEL CONTROLADOR DE EMPRESA Y SEGURO
+    // CONTROLADOR DE EMPRESA Y SEGURO
     private final Empresas_Controlador controladorEmpresa = new Empresas_Controlador();
     private final Seguros_Controlador controladorSeguro = new Seguros_Controlador();
 
-    //OBJETO DE LA VISTA EMPRESA PRINCIPAL
+    // VARIABLE VISTA-EMPRESA PRINCIPAL
     private final Empresas_Vista vistaE;
 
-    //MODELO DE LA TABLA
+    // MODELO DE LA TABLA
     private DefaultTableModel modelo;
 
-    //CONSTRUCTOR
+    // CONSTRUCTOR
     public Empresas_Agregar_Vista(Empresas_Vista vistaEmpresa) {
         initComponents();
         this.setLocationRelativeTo(null);
+        
+        // APLICAMOS LA VISTA-EMPRESA PRINCIPAL
         this.vistaE = vistaEmpresa;
 
-        //CARGAMOS LOS SEGUROS
+        // CARGAMOS LOS SEGUROS
         cargarDatos();
     }
 
-    //METODO PARA CARGAR LOS SEGUROS EN LA TABLA
+    // METODO PARA CARGAR LOS SEGUROS EN LA TABLA
     public void cargarDatos() {
-        //SE APLICA LAS COLUMNAS
+        
+        // SE APLICA LAS COLUMNAS
         String columnas[] = {"ID", "NOMBRE"};
         this.modelo = new DefaultTableModel(columnas, 0);
-
-        //OBTENEMOS LOS SEGUROS
-        List<Seguros_Object> listaSeguros = this.controladorSeguro.obtenerTodosSeguros_C();
-
-        //CARGAMOS TODOS LOS DATOS           
-        Object arrayObjetos[] = new Object[2];
-        for (Seguros_Object aux : listaSeguros) {
-            arrayObjetos[0] = aux.getId_seguro();
-            arrayObjetos[1] = aux.getNombre();
-            this.modelo.addRow(arrayObjetos);
+        
+        // LIMPIAMOS LA TABLA
+        this.modelo.setRowCount(0);
+        
+        // TOTAL DE SEGUROS
+        int totalSeguros = this.controladorSeguro.totalSeguros_C().join();
+        
+        if(totalSeguros != 0){
+            
+            // OBTENEMOS LOS SEGUROS
+            this.controladorSeguro.obtenerTodosSeguros_C().thenAccept(listaSeguros -> {  
+                
+                // CARGAMOS TODOS LOS DATOS           
+                Object arrayObjetos[] = new Object[2];
+                for (Seguros_Object aux : listaSeguros) {
+                    arrayObjetos[0] = aux.getId_seguro();
+                    arrayObjetos[1] = aux.getNombre();
+                    this.modelo.addRow(arrayObjetos);
+                }
+                this.tablaSeguros.setModel(this.modelo);           
+            }).exceptionally(ex ->{
+                    return null;
+                });
+           
+        }else{
+            this.tablaSeguros.setModel(this.modelo);
         }
-
-        this.tablaSeguros.setModel(this.modelo);
     }
 
-    //COMPONENTES DE LA INTERFAZ
+    // COMPONENTES DE LA INTERFAZ
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -236,52 +253,76 @@ public class Empresas_Agregar_Vista extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    // --- METODO PARA CAMBIAR LA ESTETICA DEL CURSOR Y EL BOTON ---
+    // METODO-ESTETICO
     private void btnAgregarMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnAgregarMouseEntered
         this.btnAgregar.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         this.btnAgregar.setBackground(Color.GRAY);
     }//GEN-LAST:event_btnAgregarMouseEntered
 
+    // METODO-ESTETICO
     private void btnAgregarMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnAgregarMouseExited
         this.btnAgregar.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnAgregarMouseExited
-    // --- METODO PARA CAMBIAR LA ESTETICA DEL CURSOR Y EL BOTON ---
 
-    //METODO PARA AGREGAR LA EMPRESA
+    // METODO PARA AGREGAR LA EMPRESA
     private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
         try {
+            
             String idEmp = this.txtIdEmp.getText().toUpperCase();
             String nombre = this.txtNombre.getText().toUpperCase();
             String ciudad = this.txtCiudad.getText().toUpperCase();
-
-            if ((this.controladorEmpresa.comprobarCamposEmpresas_C(idEmp, nombre, ciudad)) && !(this.controladorEmpresa.idEmpresarialExistente(idEmp))) {
-
-                if (this.tablaSeguros.getSelectedRow() != -1) {
-                    Date fechaActual = new Date();
-                    Seguros_Object seguro = this.controladorSeguro.obtenerSeguro_C((int) this.tablaSeguros.getValueAt(this.tablaSeguros.getSelectedRow(), 0));
-                    Empresas_Object empresa = new Empresas_Object(idEmp, nombre, ciudad, fechaActual, seguro);
-                    this.controladorEmpresa.guardarEmpresa_C(empresa);
-                    this.txtIdEmp.setText("");
-                    this.txtNombre.setText("");
-                    this.txtCiudad.setText("");
-                    this.tablaSeguros.clearSelection();
-                    this.dispose();
-                    this.vistaE.cargarDatosTabla("");
-                } else {
-                    JOptionPane.showMessageDialog(null, "TIENES QUE SELECCIONAR UN SEGURO DE LA TABLA", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
-                }
-
-            } else {
-                JOptionPane.showMessageDialog(null, "ID EMPRESARIAL YA EXISTENTE O ERROR EN ALGUN CAMPO", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
+            
+            if(Validaciones.validarEmpresa(idEmp, nombre, ciudad)){
+                
+                this.controladorEmpresa.idEmpresarialExistente(idEmp).thenAccept(existe -> {
+                
+                    if(!existe){
+                        
+                        if (this.tablaSeguros.getSelectedRow() != -1) {
+                            Date fechaActual = new Date();
+                            
+                            this.controladorSeguro.obtenerSeguro_C((int) this.tablaSeguros.getValueAt(this.tablaSeguros.getSelectedRow(), 0)).thenAccept(seguro -> {
+                                if(seguro != null){
+                                    Empresas_Object empresa = new Empresas_Object(idEmp, nombre, ciudad, fechaActual, seguro);
+                                    this.controladorEmpresa.guardarEmpresa_C(empresa).thenRun(() -> {
+                                        this.vistaE.cargarDatosTabla("");
+                                    }).exceptionally(ex ->{
+                                        return null;
+                                    });
+                                    this.txtIdEmp.setText("");
+                                    this.txtNombre.setText("");
+                                    this.txtCiudad.setText("");
+                                    this.tablaSeguros.clearSelection();
+                                    this.dispose();                                   
+                                }
+                                                                
+                            }).exceptionally(ex ->{
+                                return null;
+                            });
+                            
+                        } else {
+                            JOptionPane.showMessageDialog(null, "TIENES QUE SELECCIONAR UN SEGURO DE LA TABLA", "AGREGAR EMPRESA", JOptionPane.INFORMATION_MESSAGE);
+                        }
+                        
+                    }else{
+                        JOptionPane.showMessageDialog(null, "ID EMPRESARIAL YA EXISTENTE", "AGREGAR EMPRESA", JOptionPane.INFORMATION_MESSAGE);
+                    }
+                    
+                }).exceptionally(ex ->{
+                    return null;
+                });
+                
+            }else{
+                JOptionPane.showMessageDialog(null, "HAS INTRODUCIDO UN DATO ERRONEO", "AGREGAR EMPRESA", JOptionPane.INFORMATION_MESSAGE);
             }
 
         } catch (HeadlessException | NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "ERROR EN ALGUN CAMPO", "INFORMACION", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "HAS INTRODUCIDO UN DATO ERRONEO", "AGREGAR EMPRESA", JOptionPane.ERROR_MESSAGE);
         }
 
     }//GEN-LAST:event_btnAgregarActionPerformed
 
-    //METODO PARA CUANDO SE CIERRA LA VENTANA
+    // METODO PARA CUANDO SE CIERRA LA VENTANA
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
         this.txtIdEmp.setText("");
         this.txtNombre.setText("");

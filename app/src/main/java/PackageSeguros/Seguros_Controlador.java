@@ -43,6 +43,11 @@ public class Seguros_Controlador {
     public CompletableFuture<List<Empresas_Object>> obtenerEmpresasPorSeguro_C(int idSeguro) {
         return CompletableFuture.supplyAsync(() -> this.modeloSeguro.obtenerEmpresasPorSeguro_M(idSeguro));
     }
+    
+    // METODO PARA OBTENER EL TOTAL DE SEGUROS (CONTROLADOR)
+    public CompletableFuture<Integer> totalSeguros_C(){
+        return CompletableFuture.supplyAsync(() -> this.modeloSeguro.obtenerTotalSeguros_M());
+    }
 
     // METODO PARA COMPROBAR LA EXISTENCIA DEL NOMBRE DEL SEGURO
     public CompletableFuture<Boolean> nombreExistente(String nombre) {

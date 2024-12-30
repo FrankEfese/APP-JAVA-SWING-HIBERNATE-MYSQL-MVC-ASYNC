@@ -14,22 +14,22 @@ public class Empresas_Modelo {
 
     private final SessionFactory sessionFactory;
 
-    //CONSTRUCTOR
+    // CONSTRUCTOR
     public Empresas_Modelo(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
 
-    //METODO PARA OBTENER TODOS LAS EMPRESAS (MODELO)
+    // METODO PARA OBTENER TODOS LAS EMPRESAS (MODELO)
     public List<Empresas_Object> obtenerTodasEmpresas_M() {
         try (Session session = sessionFactory.openSession()) {
             return session.createQuery("FROM Empresas_Object", Empresas_Object.class).list();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "ERROR AL OBTENER LAS EMPRESAS", "INFORMACION", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "ERROR AL OBTENER LAS EMPRESAS", "EMPRESAS-M", JOptionPane.ERROR_MESSAGE);
             return new ArrayList<>();
         }
     }
 
-    //METODO PARA GUARDAR LA EMPRESA (MODELO)
+    // METODO PARA GUARDAR LA EMPRESA (MODELO)
     public void guardarEmpresa_M(Empresas_Object empresa) {
 
         try {
@@ -38,56 +38,53 @@ public class Empresas_Modelo {
             Transaction transaccion = sesion.beginTransaction();
 
             sesion.save(empresa);
-            JOptionPane.showMessageDialog(null, "EMPRESA AGREGADA", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "EMPRESA AGREGADA", "EMPRESAS-M", JOptionPane.INFORMATION_MESSAGE);
             transaccion.commit();
 
         } catch (HibernateException e) {
-            JOptionPane.showMessageDialog(null, "ERROR AL AGREGAR LA EMPRESA", "INFORMACION", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "ERROR AL AGREGAR LA EMPRESA", "EMPRESAS-M", JOptionPane.ERROR_MESSAGE);
         }
 
     }
 
-    //METODO PARA ELIMINAR UNA EMPRESA (MODELO)
+    // METODO PARA ELIMINAR UNA EMPRESA (MODELO)
     public void eliminarEmpresa_M(int idEmpresa) {
         try (Session session = sessionFactory.openSession()) {
             Transaction transaction = session.beginTransaction();
             Empresas_Object empresa = session.get(Empresas_Object.class, idEmpresa);
             if (empresa != null) {
                 session.delete(empresa);
-                JOptionPane.showMessageDialog(null, "EMPRESA ELIMINADA CORRECTAMENTE", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, "EMPRESA ELIMINADA CORRECTAMENTE", "EMPRESAS-M", JOptionPane.INFORMATION_MESSAGE);
             }
             transaction.commit();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "ERROR AL ELIMINAR LA EMPRESA", "INFORMACION", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "ERROR AL ELIMINAR LA EMPRESA", "EMPRESAS-M", JOptionPane.ERROR_MESSAGE);
         }
-    }
+    }   
     
-    
-    //METODO PARA ACTUALIZAR LA EMPRESA (MODELO)
+    // METODO PARA ACTUALIZAR LA EMPRESA (MODELO)
     public void actualizarEmpresa_M(Empresas_Object empresa) {
         try (Session session = sessionFactory.openSession()) {
             Transaction transaction = session.beginTransaction();
             session.update(empresa);
-            JOptionPane.showMessageDialog(null, "EMPRESA ACTUALIZADA", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "EMPRESA ACTUALIZADA", "EMPRESAS-M", JOptionPane.INFORMATION_MESSAGE);
             transaction.commit();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "ERROR AL ACTUALIZAR LA EMPRESA", "INFORMACION", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "ERROR AL ACTUALIZAR LA EMPRESA", "EMPRESAS-M", JOptionPane.ERROR_MESSAGE);
         }
-    }
+    }   
     
-    
-    //METODO PARA OBTENER UNA EMPRESA (MODELO)
+    // METODO PARA OBTENER UNA EMPRESA (MODELO)
     public Empresas_Object obtenerEmpresa_M(int idEmpresa) {
         try (Session session = sessionFactory.openSession()) {
             return session.get(Empresas_Object.class, idEmpresa);
         } catch (HibernateException e) {
-            JOptionPane.showMessageDialog(null, "ERROR AL OBTENER LA EMPRESA", "INFORMACION", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "ERROR AL OBTENER LA EMPRESA", "EMPRESAS-M", JOptionPane.ERROR_MESSAGE);
             return null;
         }
-    }
+    }   
     
-    
-    //METODO PARA OBTENER LOS EMPLEADOS (MODELO)
+    // METODO PARA OBTENER LOS EMPLEADOS (MODELO)
     public List<Empleados_Object> obtenerEmpleadosDeEmpresa_M(int idEmpresa) {
         try (Session session = sessionFactory.openSession()) {
             String jpql = "SELECT emp FROM Empleados_Object emp WHERE emp.empresas_id_empresa.id_empresa = :id_Empresa";
@@ -95,13 +92,12 @@ public class Empresas_Modelo {
                     .setParameter("id_Empresa", idEmpresa)
                     .getResultList();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "ERROR AL OBTENER LOS EMPLEADOS DE LA EMPRESA", "INFORMACION", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "ERROR AL OBTENER LOS EMPLEADOS DE LA EMPRESA", "EMPRESAS-M", JOptionPane.ERROR_MESSAGE);
             return new ArrayList<>();
         }
-    }
+    }    
     
-    
-    //METODO PARA OBTENER LOS PRODUCTOS (MODELO)
+    // METODO PARA OBTENER LOS PRODUCTOS (MODELO)
     public List<Productos_Object> obtenerProductosDeEmpresa_M(int idProducto) {
         try (Session session = sessionFactory.openSession()) {
             String jpql = "SELECT empp FROM Productos_Object empp WHERE empp.empresas_id_empresa_p.id_empresa = :id_Producto";
@@ -109,8 +105,19 @@ public class Empresas_Modelo {
                     .setParameter("id_Producto", idProducto)
                     .getResultList();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "ERROR AL OBTENER LOS PRODUCTOS DE LA EMPRESA", "INFORMACION", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "ERROR AL OBTENER LOS PRODUCTOS DE LA EMPRESA", "EMPRESAS-M", JOptionPane.ERROR_MESSAGE);
             return new ArrayList<>();
+        }
+    }
+    
+    // METODO PARA OBTENER EL TOTAL DE EMPRESAS (MODELO)
+    public int obtenerTotalEmpresas_M() {
+        try (Session session = sessionFactory.openSession()) {
+            Long total = session.createQuery("SELECT COUNT(*) FROM Empresas_Object", Long.class).uniqueResult();
+            return total != null ? total.intValue() : 0;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "ERROR AL OBTENER EL TOTAL DE EMPRESAS", "EMPRESAS-M", JOptionPane.ERROR_MESSAGE);
+            return 0;
         }
     }
 

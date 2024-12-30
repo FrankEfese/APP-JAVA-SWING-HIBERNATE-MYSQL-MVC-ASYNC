@@ -7,32 +7,33 @@ import PackageSeguros.*;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.text.SimpleDateFormat;
-import java.util.List;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
 public class Empresas_Vista extends javax.swing.JPanel {
 
-    //OBJETO DEL CONTROLADOR DE EMPRESAS Y SEGUROS
+    // CONTROLADOR DE EMPRESAS Y SEGUROS
     private final Empresas_Controlador controladorEmpresas = new Empresas_Controlador();
-    private final Seguros_Controlador controladorSeguro = new Seguros_Controlador();
+    private final Seguros_Controlador controladorSeguros = new Seguros_Controlador();
 
-    //MODELO DE LA TABLA
+    // MODELO DE LA TABLA
     private DefaultTableModel modelo;
 
-    //VISTAS DE OPCIONES
+    // VARIABLES VISTAS-OPCIONES
     private Empresas_VerEmpresa_Vista verEmpresaVista;
     private Empresas_Agregar_Vista agregarEmpresaVista;
     private Empresas_Actualizar_Vista actualizarEmpresasVista;
 
-    //CONSTRUCTOR
+    // CONSTRUCTOR
     public Empresas_Vista() {
         initComponents();
-        //LLAMAMOS AL METODO PARA CARGAR LOS DATOS EN LA TABLA
+        
+        // LLAMAMOS AL METODO PARA CARGAR LOS DATOS EN LA TABLA
         cargarDatosTabla("");
     }
 
-    //COMPONENTES DE LA INTERFAZ
+    // COMPONENTES DE LA INTERFAZ
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -322,49 +323,30 @@ public class Empresas_Vista extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    //METODO PARA CARGAR LOS DATOS DE LAS EMPRESAS EN LA TABLA
+    // METODO PARA CARGAR LOS DATOS DE LAS EMPRESAS EN LA TABLA
     public void cargarDatosTabla(String texto) {
 
-        //SE APLICA LAS COLUMNAS
+        // DESHABILITAMOS LA TABLA TEMPORALMENTE
+        this.tablaEmpresas.setEnabled(false);
+
+        // SE APLICA LAS COLUMNAS
         String columnas[] = {"ID", "ID-EMPRESARIAL", "NOMBRE", "CIUDAD", "SEGURO", "FECHA ALTA"};
         this.modelo = new DefaultTableModel(columnas, 0);
 
-        //FORMATO FECHA
+        // LIMPIAMOS LA TABLA
+        this.modelo.setRowCount(0);
+
+        // FORMATO FECHA
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 
-        //OBTENEMOS LAS EMPRESAS
-        List<Empresas_Object> listaEmpresas = this.controladorEmpresas.obtenerTodasEmpresas_C();
+        // OBTENEMOS LAS EMPRESAS
+        this.controladorEmpresas.obtenerTodasEmpresas_C().thenAccept(listaEmpresas -> {
 
-        //APLICAMOS EL TOTAL DE EMPRESAS
-        this.txtTotalEmpresas.setText("* Total de Empresas : " + listaEmpresas.size());
+            if (texto.isEmpty()) {
 
-        if (texto.isEmpty()) {
-
-            //CARGAMOS TODOS LOS DATOS           
-            Object arrayObjetos[] = new Object[6];
-            for (Empresas_Object aux : listaEmpresas) {
-                arrayObjetos[0] = aux.getId_empresa();
-                arrayObjetos[1] = aux.getId_empresarial();
-                arrayObjetos[2] = aux.getNombre();
-                arrayObjetos[3] = aux.getCiudad();
-                if (aux.getSeguros_id_seguro() == null) {
-                    arrayObjetos[4] = "SIN SEGURO";
-                } else {
-                    arrayObjetos[4] = this.controladorSeguro.obtenerSeguro_C(aux.getSeguros_id_seguro()
-                            .getId_seguro()).getNombre();
-                }
-                arrayObjetos[5] = dateFormat.format(aux.getF_alta());
-                this.modelo.addRow(arrayObjetos);
-            }
-
-            this.tablaEmpresas.setModel(this.modelo);
-
-        } else {
-
-            //CARGAMOS LOS DATOS QUE CONTENGAN EL TEXTO INTRODUCIDO EN EL FILTRO           
-            Object arrayObjetos[] = new Object[6];
-            for (Empresas_Object aux : listaEmpresas) {
-                if (aux.getNombre().contains(texto.toUpperCase())) {
+                // CARGAMOS TODOS LOS DATOS           
+                Object arrayObjetos[] = new Object[6];
+                for (Empresas_Object aux : listaEmpresas) {
                     arrayObjetos[0] = aux.getId_empresa();
                     arrayObjetos[1] = aux.getId_empresarial();
                     arrayObjetos[2] = aux.getNombre();
@@ -372,152 +354,210 @@ public class Empresas_Vista extends javax.swing.JPanel {
                     if (aux.getSeguros_id_seguro() == null) {
                         arrayObjetos[4] = "SIN SEGURO";
                     } else {
-                        arrayObjetos[4] = this.controladorSeguro.obtenerSeguro_C(aux.getSeguros_id_seguro()
-                                .getId_seguro()).getNombre();
+                        arrayObjetos[4] = aux.getSeguros_id_seguro().getNombre();
                     }
                     arrayObjetos[5] = dateFormat.format(aux.getF_alta());
                     this.modelo.addRow(arrayObjetos);
                 }
+
+                SwingUtilities.invokeLater(() -> {
+                    this.tablaEmpresas.setModel(modelo);
+                    this.tablaEmpresas.setEnabled(true);
+                    this.txtTotalEmpresas.setText("* Total de Empresas : " + this.tablaEmpresas.getRowCount());
+                });
+
+            } else {
+
+                // CARGAMOS LOS DATOS QUE CONTENGAN EL TEXTO INTRODUCIDO EN EL FILTRO           
+                Object arrayObjetos[] = new Object[6];
+                for (Empresas_Object aux : listaEmpresas) {
+                    if (aux.getNombre().contains(texto.toUpperCase())) {
+                        arrayObjetos[0] = aux.getId_empresa();
+                        arrayObjetos[1] = aux.getId_empresarial();
+                        arrayObjetos[2] = aux.getNombre();
+                        arrayObjetos[3] = aux.getCiudad();
+                        if (aux.getSeguros_id_seguro() == null) {
+                            arrayObjetos[4] = "SIN SEGURO";
+                        } else {
+                            arrayObjetos[4] = aux.getSeguros_id_seguro().getNombre();
+                        }
+                        arrayObjetos[5] = dateFormat.format(aux.getF_alta());
+                        this.modelo.addRow(arrayObjetos);
+                    }
+                }
+
+                SwingUtilities.invokeLater(() -> {
+                    this.tablaEmpresas.setModel(modelo);
+                    this.tablaEmpresas.setEnabled(true);
+                    this.txtTotalEmpresas.setText("* Total de Empresas : " + this.tablaEmpresas.getRowCount());
+                });
             }
 
-            this.tablaEmpresas.setModel(this.modelo);
-        }
+        });
     }
 
-    // --- METODOS PARA CAMBIAR LA ESTETICA DEL CURSOR Y EL BOTON ---
+    // METODO-ESTETICO
     private void btnVerEmpresaMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnVerEmpresaMouseEntered
         this.btnVerEmpresa.setBackground(Color.GRAY);
         this.btnVerEmpresa.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }//GEN-LAST:event_btnVerEmpresaMouseEntered
 
+    // METODO-ESTETICO
     private void btnVerEmpresaMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnVerEmpresaMouseExited
         this.btnVerEmpresa.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnVerEmpresaMouseExited
 
+    // METODO-ESTETICO
     private void btnAgregarEmpresaMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnAgregarEmpresaMouseEntered
         this.btnAgregarEmpresa.setBackground(Color.GRAY);
         this.btnAgregarEmpresa.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }//GEN-LAST:event_btnAgregarEmpresaMouseEntered
 
+    // METODO-ESTETICO
     private void btnAgregarEmpresaMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnAgregarEmpresaMouseExited
         this.btnAgregarEmpresa.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnAgregarEmpresaMouseExited
 
+    // METODO-ESTETICO
     private void btnActualizarEmpresaMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnActualizarEmpresaMouseEntered
         this.btnActualizarEmpresa.setBackground(Color.GRAY);
         this.btnActualizarEmpresa.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }//GEN-LAST:event_btnActualizarEmpresaMouseEntered
 
+    // METODO-ESTETICO
     private void btnActualizarEmpresaMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnActualizarEmpresaMouseExited
         this.btnActualizarEmpresa.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnActualizarEmpresaMouseExited
 
+    // METODO-ESTETICO
     private void btnEliminarEmpresaMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEliminarEmpresaMouseEntered
         this.btnEliminarEmpresa.setBackground(Color.GRAY);
         this.btnEliminarEmpresa.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }//GEN-LAST:event_btnEliminarEmpresaMouseEntered
 
+    // METODO-ESTETICO
     private void btnEliminarEmpresaMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEliminarEmpresaMouseExited
         this.btnEliminarEmpresa.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnEliminarEmpresaMouseExited
 
+    // METODO-ESTETICO
     private void btnReinicioMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnReinicioMouseEntered
         this.btnReinicio.setBackground(Color.GRAY);
         this.btnReinicio.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }//GEN-LAST:event_btnReinicioMouseEntered
 
+    // METODO-ESTETICO
     private void btnReinicioMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnReinicioMouseExited
         this.btnReinicio.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnReinicioMouseExited
-    // --- METODOS PARA CAMBIAR LA ESTETICA DEL CURSOR Y EL BOTON ---
 
-    //METODO PARA EL FILTRO DE BUSQUEDA
+    // METODO PARA EL FILTRO DE BUSQUEDA
     private void txtFiltroKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtFiltroKeyReleased
         String texto = this.txtFiltro.getText();
         cargarDatosTabla(texto);
     }//GEN-LAST:event_txtFiltroKeyReleased
 
-    //METODO PARA REINICIAR EL FILTRO Y RECARGAR LA TABLA
+    // METODO PARA REINICIAR EL FILTRO Y RECARGAR LA TABLA
     private void btnReinicioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReinicioActionPerformed
         this.txtFiltro.setText("");
         cargarDatosTabla("");
     }//GEN-LAST:event_btnReinicioActionPerformed
 
-    //METODO PARA ELIMINAR UNA EMPRESA
+    // METODO PARA ELIMINAR UNA EMPRESA
     private void btnEliminarEmpresaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarEmpresaActionPerformed
         if (this.tablaEmpresas.getSelectedRow() != -1) {
-            int respuesta = JOptionPane.showConfirmDialog(null, "¿DESEAS ELIMINAR LA EMPRESA SELECCIONADA?", "INFORMACION", JOptionPane.YES_NO_OPTION);
+            int respuesta = JOptionPane.showConfirmDialog(null, "¿DESEAS ELIMINAR LA EMPRESA SELECCIONADA?", "EMPRESAS", JOptionPane.YES_NO_OPTION);
             if (respuesta == JOptionPane.YES_OPTION) {
                 int idEmpresa = (int) this.tablaEmpresas.getValueAt(this.tablaEmpresas.getSelectedRow(), 0);
-                this.controladorEmpresas.eliminarEmpresa_C(idEmpresa);
-                cargarDatosTabla("");
+                this.controladorEmpresas.eliminarEmpresa_C(idEmpresa).thenRun(() -> {
+                    cargarDatosTabla("");
+                }).exceptionally(ex -> {
+                    return null;
+                });
+
+                if (this.verEmpresaVista != null && this.verEmpresaVista.getIdEmpresa() == idEmpresa) {
+                    this.verEmpresaVista.dispose();
+                }
+
+                if (this.actualizarEmpresasVista != null && this.actualizarEmpresasVista.getEmpresa().getId_empresa() == idEmpresa) {
+                    this.actualizarEmpresasVista.dispose();
+                }
             }
 
         } else {
-            JOptionPane.showMessageDialog(null, "DEBES SELECCIONAR UNA FILA DE LA TABLA", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "DEBES SELECCIONAR UNA FILA DE LA TABLA", "EMPRESAS", JOptionPane.INFORMATION_MESSAGE);
         }
     }//GEN-LAST:event_btnEliminarEmpresaActionPerformed
 
-    //METODO PARA ABRIR LA PESTAÑA QUE PERMITE AGREGAR LAS EMPRESAS
+    // METODO PARA ABRIR LA PESTAÑA QUE PERMITE AGREGAR LAS EMPRESAS
     private void btnAgregarEmpresaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarEmpresaActionPerformed
 
-        if (!this.controladorSeguro.obtenerTodosSeguros_C().isEmpty()) {
-            if (this.agregarEmpresaVista == null) {
-                this.agregarEmpresaVista = new Empresas_Agregar_Vista(this);
-                this.agregarEmpresaVista.setVisible(true);
+        this.controladorSeguros.totalSeguros_C().thenAccept(total -> {
+            if (total > 0) {
+                if (this.agregarEmpresaVista == null) {
+                    this.agregarEmpresaVista = new Empresas_Agregar_Vista(this);
+                    this.agregarEmpresaVista.setVisible(true);
+                } else {
+                    this.agregarEmpresaVista.setVisible(true);
+                }
             } else {
-                this.agregarEmpresaVista.setVisible(true);
+                JOptionPane.showMessageDialog(null, "AUN NO HAY SEGUROS DISPONIBLES QUE APLICAR A LA EMPRESA", "EMPRESAS", JOptionPane.INFORMATION_MESSAGE);
             }
-        } else {
-            JOptionPane.showMessageDialog(null, "AUN NO HAY SEGUROS DISPONIBLES QUE APLICAR A LA EMPRESA", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
-        }
+        });
 
     }//GEN-LAST:event_btnAgregarEmpresaActionPerformed
 
-    //METODO PARA ABRIR LA PESTAÑA QUE PERMITE ACTUALIZAR LAS EMPRESAS
+    // METODO PARA ABRIR LA PESTAÑA QUE PERMITE ACTUALIZAR LAS EMPRESAS
     private void btnActualizarEmpresaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarEmpresaActionPerformed
         if (this.tablaEmpresas.getSelectedRow() != -1) {
             int idEmpresa = (int) this.tablaEmpresas.getValueAt(this.tablaEmpresas.getSelectedRow(), 0);
-            Empresas_Object empresa = this.controladorEmpresas.obtenerEmpresa_C(idEmpresa);
+            this.controladorEmpresas.obtenerEmpresa_C(idEmpresa).thenAccept(empresa -> {
 
-            if (empresa != null) {
-                int indice = this.controladorSeguro.obtenerFilaTabla(empresa.getSeguros_id_seguro());
-                if (this.actualizarEmpresasVista == null) {
-                    this.actualizarEmpresasVista = new Empresas_Actualizar_Vista(this, empresa, indice);
-                    this.actualizarEmpresasVista.setVisible(true);
+                if (empresa != null) {
+                    this.controladorSeguros.obtenerFilaTabla(empresa.getSeguros_id_seguro()).thenAccept(indice -> {
+
+                        if (this.actualizarEmpresasVista == null) {
+                            this.actualizarEmpresasVista = new Empresas_Actualizar_Vista(this, empresa, indice);
+                            this.actualizarEmpresasVista.setVisible(true);
+                        } else {
+                            this.actualizarEmpresasVista.setEmpresa(empresa);
+                            this.actualizarEmpresasVista.setIndice(indice);
+                            this.actualizarEmpresasVista.cargarDatos();
+                            this.actualizarEmpresasVista.setVisible(true);
+                        }
+
+                    });
+                }
+
+            });
+
+        } else {
+            JOptionPane.showMessageDialog(null, "DEBES SELECCIONAR UNA FILA DE LA TABLA", "EMPRESAS", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }//GEN-LAST:event_btnActualizarEmpresaActionPerformed
+
+    // METODO PARA ABRIR LA PESTAÑA QUE PERMITE VER LOS DATOS DE LA EMPRESA
+    private void btnVerEmpresaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerEmpresaActionPerformed
+        if (this.tablaEmpresas.getSelectedRow() != -1) {
+            int idEmpresa = (int) this.tablaEmpresas.getValueAt(this.tablaEmpresas.getSelectedRow(), 0);
+            if (idEmpresa > 0) {
+
+                if (this.verEmpresaVista == null) {
+                    this.verEmpresaVista = new Empresas_VerEmpresa_Vista(idEmpresa);
+                    this.verEmpresaVista.setVisible(true);
                 } else {
-                    this.actualizarEmpresasVista.cargarDatos(empresa, indice);
-                    this.actualizarEmpresasVista.setVisible(true);
+                    this.verEmpresaVista.setIdEmpresa(idEmpresa);
+                    this.verEmpresaVista.cargarDatos();
+                    this.verEmpresaVista.setVisible(true);
                 }
             }
 
         } else {
-            JOptionPane.showMessageDialog(null, "DEBES SELECCIONAR UNA FILA DE LA TABLA", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
-        }
-    }//GEN-LAST:event_btnActualizarEmpresaActionPerformed
-
-    //METODO PARA ABRIR LA PESTAÑA QUE PERMITE VER LOS DATOS DE LA EMPRESA
-    private void btnVerEmpresaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerEmpresaActionPerformed
-        if(this.tablaEmpresas.getSelectedRow() != -1){
-            
-            Empresas_Object empresa = this.controladorEmpresas.obtenerEmpresa_C((int) this.tablaEmpresas.getValueAt(this.tablaEmpresas.getSelectedRow(), 0));
-            if (empresa != null) {
-
-                if (this.verEmpresaVista == null) {
-                    this.verEmpresaVista = new Empresas_VerEmpresa_Vista(empresa);
-                    this.verEmpresaVista.setVisible(true);
-                } else {
-                    this.verEmpresaVista.cargarDatos(empresa);
-                    this.verEmpresaVista.setVisible(true);
-                }
-            }
-            
-        }else{
-            JOptionPane.showMessageDialog(null, "DEBES SELECCIONAR UNA FILA DE LA TABLA", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "DEBES SELECCIONAR UNA FILA DE LA TABLA", "EMPRESAS", JOptionPane.INFORMATION_MESSAGE);
         }
     }//GEN-LAST:event_btnVerEmpresaActionPerformed
 
-    //METODO PARA CERRAR LAS VENTANAS
+    // METODO PARA CERRAR LAS VENTANAS
     public void eliminarVentanas(){
         
         if(this.verEmpresaVista != null){
@@ -530,6 +570,17 @@ public class Empresas_Vista extends javax.swing.JPanel {
         
         if(this.actualizarEmpresasVista != null){
             this.actualizarEmpresasVista.dispose();
+        }
+    }
+    
+    // METODO PARA ACTUALIZAR DATOS VENTANA-PRINCIPAL Y VENTANA VER-EMPRESA
+    public void actualizarDatos(int idEmpresa){
+        
+        cargarDatosTabla("");
+        
+        if(this.verEmpresaVista != null && this.verEmpresaVista.getIdEmpresa() == idEmpresa){
+            this.verEmpresaVista.setIdEmpresa(idEmpresa);
+            this.verEmpresaVista.cargarDatos();
         }
     }
 

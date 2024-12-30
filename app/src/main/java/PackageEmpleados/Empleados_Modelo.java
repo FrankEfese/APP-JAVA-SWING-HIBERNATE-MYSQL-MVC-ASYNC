@@ -90,4 +90,15 @@ public class Empleados_Modelo {
             return null;
         }
     }
+    
+    // METODO PARA OBTENER EL TOTAL DE EMPLEADOS (MODELO)
+    public int obtenerTotalEmpleados_M() {
+        try (Session session = sessionFactory.openSession()) {
+            Long total = session.createQuery("SELECT COUNT(*) FROM Empleados_Object", Long.class).uniqueResult();
+            return total != null ? total.intValue() : 0;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "ERROR AL OBTENER EL TOTAL DE EMPLEADOS", "EMPLEADOS-M", JOptionPane.ERROR_MESSAGE);
+            return 0;
+        }
+    }
 }
