@@ -2,7 +2,7 @@
 
 [![HOLA-SOY-FRAN.png](https://i.postimg.cc/1zF33sYY/HOLA-SOY-FRAN.png)](https://postimg.cc/LqHpyKSz)
 
-<h4 align="center">An application for a management agency, developed using the Java language. This application utilizes Java Swing for the development of the interface, and Hibernate as the framework for interacting with the MySQL database. The application follows the Model-View-Controller architecture.</h4>
+<h4 align="center">An application for a management agency, developed using the Java language. This application utilizes Java Swing for the development of the interface, and Hibernate as the framework for interacting with the MySQL database. The application follows the Model-View-Controller architecture and supports asynchronous operations using CompletableFuture, enhancing performance and responsiveness by handling database interactions and other background tasks without blocking the user interface.</h4>
 
 <br>
 
