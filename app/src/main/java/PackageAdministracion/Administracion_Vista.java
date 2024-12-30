@@ -6,30 +6,31 @@ import PackageLogin.Login_Object;
 import PackagePrincipal.Principal_Vista;
 import java.awt.Color;
 import java.awt.Cursor;
-import java.util.List;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
 public class Administracion_Vista extends javax.swing.JPanel {
 
-    //OBJETO DEL CONTROLADOR DE ADMINISTRACION
+    // CONTROLADOR-ADMINISTRACION
     private final Administracion_Controlador controladorAdmin = new Administracion_Controlador();
 
-    //MODELO DE LA TABLA
+    // MODELO DE LA TABLA
     private DefaultTableModel modelo;
 
-    //VISTAS DE OPCIONES
+    // VARIABLES VISTAS-OPCIONES
     private Administracion_Agregar_Vista agregarAdminVista;
     private Administracion_Actualizar_Vista actualizarAdminVista;
 
-    //CONSTRUCTOR
+    // CONSTRUCTOR
     public Administracion_Vista() {
         initComponents();
-        //LLAMAMOS AL METODO PARA CARGAR LOS DATOS EN LA TABLA
+        
+        // LLAMAMOS AL METODO PARA CARGAR LOS DATOS EN LA TABLA
         cargarDatosTabla("");
     }
 
-    //COMPONENTES DE LA INTERFAZ
+    // COMPONENTES DE LA INTERFAZ
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -291,86 +292,108 @@ public class Administracion_Vista extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    //METODO PARA CARGAR LOS DATOS DE LOS ADMINISTRADORES EN LA TABLA
+    // METODO PARA CARGAR LOS DATOS DE LOS ADMINISTRADORES EN LA TABLA
     public void cargarDatosTabla(String texto) {
 
-        //SE APLICA LAS COLUMNAS
+        // DESHABILITAMOS LA TABLA TEMPORALMENTE
+        this.tablaAdmin.setEnabled(false);
+
+        // SE APLICA LAS COLUMNAS
         String columnas[] = {"ID", "CORREO", "CONTRASEÑA"};
         this.modelo = new DefaultTableModel(columnas, 0);
 
-        //OBTENEMOS LOS ADMINISTRADORES
-        List<Login_Object> listaAdmins = this.controladorAdmin.obtenerTodosLogin_C();
+        // LIMPIAMOS LA TABLA
+        this.modelo.setRowCount(0);
 
-        //APLICAMOS EL TOTAL DE ADMINISTRADORES
-        this.txtTotalAdmin.setText("* Total de Administradores : " + listaAdmins.size());
+        // OBTENEMOS LOS ADMINISTRADORES
+        this.controladorAdmin.obtenerTodosLogin_C().thenAccept(listaAdmins -> {
 
-        if (texto.isEmpty()) {
+            // APLICAMOS EL TOTAL DE ADMINISTRADORES
+            this.txtTotalAdmin.setText("* Total de Administradores : " + listaAdmins.size());
 
-            //CARGAMOS TODOS LOS DATOS           
-            Object arrayObjetos[] = new Object[3];
-            for (Login_Object aux : listaAdmins) {
-                arrayObjetos[0] = aux.getId_login();
-                arrayObjetos[1] = aux.getCorreo();
-                arrayObjetos[2] = aux.getContraseña();
-                this.modelo.addRow(arrayObjetos);
-            }
+            if (texto.isEmpty()) {
 
-            this.tablaAdmin.setModel(this.modelo);
-
-        } else {
-
-            //CARGAMOS LOS DATOS QUE CONTENGAN EL TEXTO INTRODUCIDO EN EL FILTRO           
-            Object arrayObjetos[] = new Object[3];
-            for (Login_Object aux : listaAdmins) {
-                if (aux.getCorreo().contains(texto)) {
+                // CARGAMOS TODOS LOS DATOS           
+                Object arrayObjetos[] = new Object[3];
+                for (Login_Object aux : listaAdmins) {
                     arrayObjetos[0] = aux.getId_login();
                     arrayObjetos[1] = aux.getCorreo();
                     arrayObjetos[2] = aux.getContraseña();
                     this.modelo.addRow(arrayObjetos);
                 }
+
+                SwingUtilities.invokeLater(() -> {
+                    this.tablaAdmin.setModel(modelo);
+                    this.tablaAdmin.setEnabled(true);
+                    this.txtTotalAdmin.setText("* Total de Administradores : " + this.tablaAdmin.getRowCount());
+                });
+
+            } else {
+
+                // CARGAMOS LOS DATOS QUE CONTENGAN EL TEXTO INTRODUCIDO EN EL FILTRO           
+                Object arrayObjetos[] = new Object[3];
+                for (Login_Object aux : listaAdmins) {
+                    if (aux.getCorreo().contains(texto)) {
+                        arrayObjetos[0] = aux.getId_login();
+                        arrayObjetos[1] = aux.getCorreo();
+                        arrayObjetos[2] = aux.getContraseña();
+                        this.modelo.addRow(arrayObjetos);
+                    }
+                }
+
+                SwingUtilities.invokeLater(() -> {
+                    this.tablaAdmin.setModel(modelo);
+                    this.tablaAdmin.setEnabled(true);
+                    this.txtTotalAdmin.setText("* Total de Administradores : " + this.tablaAdmin.getRowCount());
+                });
             }
 
-            this.tablaAdmin.setModel(this.modelo);
-        }
+        });
     }
 
-    // --- METODOS PARA CAMBIAR LA ESTETICA DEL CURSOR Y EL BOTON ---
+    // METODO-ESTETICO
     private void btnAgregarAdminMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnAgregarAdminMouseEntered
         this.btnAgregarAdmin.setBackground(Color.GRAY);
         this.btnAgregarAdmin.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }//GEN-LAST:event_btnAgregarAdminMouseEntered
 
+    // METODO-ESTETICO
     private void btnAgregarAdminMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnAgregarAdminMouseExited
         this.btnAgregarAdmin.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnAgregarAdminMouseExited
 
+    // METODO-ESTETICO
     private void btnActualizarAdminMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnActualizarAdminMouseEntered
         this.btnActualizarAdmin.setBackground(Color.GRAY);
         this.btnActualizarAdmin.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }//GEN-LAST:event_btnActualizarAdminMouseEntered
 
+    // METODO-ESTETICO
     private void btnActualizarAdminMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnActualizarAdminMouseExited
         this.btnActualizarAdmin.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnActualizarAdminMouseExited
 
+    // METODO-ESTETICO
     private void btnEliminarAdminMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEliminarAdminMouseEntered
         this.btnEliminarAdmin.setBackground(Color.GRAY);
         this.btnEliminarAdmin.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }//GEN-LAST:event_btnEliminarAdminMouseEntered
 
+    // METODO-ESTETICO
     private void btnEliminarAdminMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEliminarAdminMouseExited
         this.btnEliminarAdmin.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnEliminarAdminMouseExited
 
+    // METODO-ESTETICO
     private void btnReinicioMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnReinicioMouseEntered
         this.btnReinicio.setBackground(Color.GRAY);
         this.btnReinicio.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }//GEN-LAST:event_btnReinicioMouseEntered
 
+    // METODO-ESTETICO
     private void btnReinicioMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnReinicioMouseExited
         this.btnReinicio.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnReinicioMouseExited
-    // --- METODOS PARA CAMBIAR LA ESTETICA DEL CURSOR Y EL BOTON ---
 
     //METODO PARA EL FILTRO DE BUSQUEDA
     private void txtFiltroKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtFiltroKeyReleased
@@ -384,7 +407,7 @@ public class Administracion_Vista extends javax.swing.JPanel {
         cargarDatosTabla("");
     }//GEN-LAST:event_btnReinicioActionPerformed
 
-    //METODO PARA ABRIR LA PESTAÑA QUE PERMITE AGREGAR LOS ADMINISTRADORES
+    // METODO PARA ABRIR LA PESTAÑA QUE PERMITE AGREGAR LOS ADMINISTRADORES
     private void btnAgregarAdminActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarAdminActionPerformed
         if (this.agregarAdminVista == null) {
             this.agregarAdminVista = new Administracion_Agregar_Vista(this);
@@ -394,50 +417,58 @@ public class Administracion_Vista extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_btnAgregarAdminActionPerformed
 
-    //METODO PARA ABRIR LA PESTAÑA QUE PERMITE ACTUALIZAR LOS ADMINISTRADORES
+    // METODO PARA ABRIR LA PESTAÑA QUE PERMITE ACTUALIZAR LOS ADMINISTRADORES
     private void btnActualizarAdminActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarAdminActionPerformed
-
         if (this.tablaAdmin.getSelectedRow() != -1) {
             int idAdmin = (int) this.tablaAdmin.getValueAt(this.tablaAdmin.getSelectedRow(), 0);
-            Login_Object admin = this.controladorAdmin.obtenerAdmin_C(idAdmin);
 
-            if (admin != null) {
-                if (this.actualizarAdminVista == null) {
-                    this.actualizarAdminVista = new Administracion_Actualizar_Vista(this, admin);
-                    this.actualizarAdminVista.setVisible(true);
-                } else {
-                    this.actualizarAdminVista.cargarDatos(admin);
-                    this.actualizarAdminVista.setVisible(true);
+            this.controladorAdmin.obtenerAdmin_C(idAdmin).thenAccept(admin -> {
+                if (admin != null) {
+                    if (this.actualizarAdminVista == null) {
+                        this.actualizarAdminVista = new Administracion_Actualizar_Vista(this, admin);
+                        this.actualizarAdminVista.setVisible(true);
+                    } else {
+                        this.actualizarAdminVista.setAdministrador(admin);
+                        this.actualizarAdminVista.cargarDatos();
+                        this.actualizarAdminVista.setVisible(true);
+                    }
                 }
-            }
+            });
 
         } else {
-            JOptionPane.showMessageDialog(null, "DEBES SELECCIONAR UNA FILA DE LA TABLA", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "DEBES SELECCIONAR UNA FILA DE LA TABLA", "ADMINISTRADORES", JOptionPane.INFORMATION_MESSAGE);
         }
     }//GEN-LAST:event_btnActualizarAdminActionPerformed
 
-    //METODO PARA ELIMINAR UN ADMINISTRADOR
+    // METODO PARA ELIMINAR UN ADMINISTRADOR
     private void btnEliminarAdminActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarAdminActionPerformed
         if (this.tablaAdmin.getSelectedRow() != -1) {
-            int respuesta = JOptionPane.showConfirmDialog(null, "¿DESEAS ELIMINAR EL ADMIN SELECCIONADO?", "INFORMACION", JOptionPane.YES_NO_OPTION);
+            int respuesta = JOptionPane.showConfirmDialog(null, "¿DESEAS ELIMINAR EL ADMIN SELECCIONADO?", "ADMINISTRADORES", JOptionPane.YES_NO_OPTION);
             if (respuesta == JOptionPane.YES_OPTION) {
                 int idAdmin = (int) this.tablaAdmin.getValueAt(this.tablaAdmin.getSelectedRow(), 0);
                 String correo = (String) this.tablaAdmin.getValueAt(this.tablaAdmin.getSelectedRow(), 1);
 
-                if (correo.equals(Principal_Vista.correoAdmin)) {
-                    JOptionPane.showMessageDialog(null, "NO PUEDES ELIMINARTE A TI MISMO", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
+                if (correo.equals(Principal_Vista.correoAdministrador)) {
+                    JOptionPane.showMessageDialog(null, "NO PUEDES ELIMINARTE A TI MISMO", "ADMINISTRADORES", JOptionPane.INFORMATION_MESSAGE);
                 } else {
-                    this.controladorAdmin.eliminarAdmin_C(idAdmin);
-                    cargarDatosTabla("");
+                    this.controladorAdmin.eliminarAdmin_C(idAdmin).thenRun(() -> {
+                        cargarDatosTabla("");
+                    }).exceptionally(ex -> {
+                        return null;
+                    });
+
+                    if (this.actualizarAdminVista != null && this.actualizarAdminVista.getAdministrador().getId_login() == idAdmin) {
+                        this.actualizarAdminVista.dispose();
+                    }
                 }
             }
 
         } else {
-            JOptionPane.showMessageDialog(null, "DEBES SELECCIONAR UNA FILA DE LA TABLA", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "DEBES SELECCIONAR UNA FILA DE LA TABLA", "ADMINISTRADORES", JOptionPane.INFORMATION_MESSAGE);
         }
     }//GEN-LAST:event_btnEliminarAdminActionPerformed
 
-    //METODO PARA CERRAR LAS VENTANAS
+    // METODO PARA CERRAR LAS VENTANAS
     public void eliminarVentanas(){
         
         if(this.agregarAdminVista != null){

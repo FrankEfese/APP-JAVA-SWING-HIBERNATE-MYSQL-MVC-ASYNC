@@ -4,6 +4,7 @@ import PackageAdministracion.Administracion_Controlador;
 import PackageAdministracion.Administracion_Vista;
 import PackageLogin.Login_Object;
 import PackagePrincipal.Principal_Vista;
+import PackageTools.Validaciones;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.HeadlessException;
@@ -11,26 +12,39 @@ import javax.swing.JOptionPane;
 
 public class Administracion_Actualizar_Vista extends javax.swing.JFrame {
 
-    //OBJETO DEL CONTROLADOR DEL ADMIN
+    // CONTROLADOR-ADMINISTRADOR
     private final Administracion_Controlador controladorAdmin = new Administracion_Controlador();
 
-    //OBJETO DE LA VISTA ADMIN PRINCIPAL
+    // VARIABLE VISTA-ADMINISTRADOR PRINCIPAL
     private final Administracion_Vista vistaA;
 
-    //OBJETO ADMIN
-    private Login_Object admin;
+    // VARIABLE-ADMINISTRADOR
+    private Login_Object administrador;
 
-    //CONSTRUCTOR
-    public Administracion_Actualizar_Vista(Administracion_Vista vistaA, Login_Object admin) {
+    // CONSTRUCTOR
+    public Administracion_Actualizar_Vista(Administracion_Vista vistaA, Login_Object administrador) {
         initComponents();
         this.setLocationRelativeTo(null);
+        
+        // APLICAMOS LAS VARIABLES ADMINISTRADOR
         this.vistaA = vistaA;
-        this.admin = admin;
-        //CARGAMOS LOS DATOS
-        cargarDatos(this.admin);
+        this.administrador = administrador;
+        
+        // CARGAMOS LOS DATOS
+        cargarDatos();
     }
 
-    //COMPONENTES DE LA INTERFAZ
+    // GETTER
+    public Login_Object getAdministrador() {
+        return administrador;
+    }
+
+    // SETTER
+    public void setAdministrador(Login_Object administrador) {
+        this.administrador = administrador;
+    }
+    
+    // COMPONENTES DE LA INTERFAZ
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -154,49 +168,64 @@ public class Administracion_Actualizar_Vista extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    //METODO PARA CARGAR LOS DATOS
-    public void cargarDatos(Login_Object admin) {
-        this.admin = admin;
-        this.txtCorreo.setText(this.admin.getCorreo());
-        this.txtContraseña.setText(this.admin.getContraseña());
+    // METODO PARA CARGAR LOS DATOS
+    public void cargarDatos() {
+        this.txtCorreo.setText(this.administrador.getCorreo());
+        this.txtContraseña.setText(this.administrador.getContraseña());
     }
 
-    // --- METODO PARA CAMBIAR LA ESTETICA DEL CURSOR Y EL BOTON ---
+    // METODO-ESTETICO
     private void btnActualizarMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnActualizarMouseEntered
         this.btnActualizar.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         this.btnActualizar.setBackground(Color.GRAY);
     }//GEN-LAST:event_btnActualizarMouseEntered
 
+    // METODO-ESTETICO
     private void btnActualizarMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnActualizarMouseExited
         this.btnActualizar.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnActualizarMouseExited
-    // --- METODO PARA CAMBIAR LA ESTETICA DEL CURSOR Y EL BOTON ---
 
-    //METODO PARA ACTUALIZAR EL ADMIN
+    // METODO PARA ACTUALIZAR EL ADMIN
     private void btnActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarActionPerformed
         try {
-            String correoActual = this.admin.getCorreo();
+            
+            String correoActual = this.administrador.getCorreo();
             String correo = this.txtCorreo.getText();
             String contra = this.txtContraseña.getText();
-
-            if (this.controladorAdmin.comprobarCamposAdmin_C(correo, contra)
-                    && (!this.controladorAdmin.correoExistente(correo) || correo.equals(this.admin.getCorreo()))) {
-                this.admin.setCorreo(correo);
-                this.admin.setContraseña(contra);
-                this.controladorAdmin.actualizarAdmin_C(admin);
-                this.dispose();
-                this.vistaA.cargarDatosTabla("");
+            
+            if(Validaciones.validarLogin(correo, contra)){
                 
-                if(correoActual.equals(Principal_Vista.correoAdmin)){
-                    Principal_Vista.correoAdmin = correo;
-                }
-
-            } else {
-                JOptionPane.showMessageDialog(null, "CORREO YA EXISTENTE O ERROR EN ALGUN CAMPO", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
+                this.controladorAdmin.correoExistente(correo).thenAccept(existe -> {
+                
+                    if(!existe || correo.equals(this.administrador.getCorreo())){
+                        
+                        this.administrador.setCorreo(correo);
+                        this.administrador.setContraseña(contra);
+                        this.controladorAdmin.actualizarAdmin_C(this.administrador).thenRun(() -> {
+                            this.vistaA.cargarDatosTabla("");
+                        }).exceptionally(ex -> {
+                            return null;
+                        });
+                        this.dispose();
+                        
+                        if(correoActual.equals(Principal_Vista.correoAdministrador)){
+                            Principal_Vista.correoAdministrador = correo;
+                        }
+                        
+                    }else{
+                        JOptionPane.showMessageDialog(null, "CORREO YA EXISTENTE", "ACTUALIZAR ADMINISTRADOR", JOptionPane.INFORMATION_MESSAGE);
+                    }
+                
+                }).exceptionally(ex -> {
+                    return null;
+                });
+                
+            }else{
+                JOptionPane.showMessageDialog(null, "HAS INTRODUCIDO UN DATO ERRONEO", "ACTUALIZAR ADMINISTRADOR", JOptionPane.ERROR_MESSAGE);
             }
 
         } catch (HeadlessException | NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "ERROR EN ALGUN CAMPO", "INFORMACION", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "HAS INTRODUCIDO UN DATO ERRONEO", "ACTUALIZAR ADMINISTRADOR", JOptionPane.ERROR_MESSAGE);
         }
 
     }//GEN-LAST:event_btnActualizarActionPerformed

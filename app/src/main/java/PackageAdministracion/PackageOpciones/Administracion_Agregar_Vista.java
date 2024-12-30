@@ -1,9 +1,9 @@
 package PackageAdministracion.PackageOpciones;
 
-
 import PackageAdministracion.Administracion_Controlador;
 import PackageAdministracion.Administracion_Vista;
 import PackageLogin.Login_Object;
+import PackageTools.Validaciones;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.HeadlessException;
@@ -11,20 +11,22 @@ import javax.swing.JOptionPane;
 
 public class Administracion_Agregar_Vista extends javax.swing.JFrame {
 
-    //OBJETO DEL CONTROLADOR DEL ADMIN
+    // CONTROLADOR-ADMINISTRADOR
     private final Administracion_Controlador controladorAdmin = new Administracion_Controlador();
 
-    //OBJETO DE LA VISTA ADMIN PRINCIPAL
+    // VARIABLE VISTA-ADMINISTRADOR PRINCIPAL
     private final Administracion_Vista vistaA;
 
-    //CONSTRUCTOR
+    // CONSTRUCTOR
     public Administracion_Agregar_Vista(Administracion_Vista vistaA) {
         initComponents();
         this.setLocationRelativeTo(null);
+        
+        // APLICAMOS LA VISTA-ADMINISTRADOR PRINCIPAL
         this.vistaA = vistaA;
     }
 
-    //COMPONENTES DE LA INTERFAZ
+    // COMPONENTES DE LA INTERFAZ
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -158,42 +160,59 @@ public class Administracion_Agregar_Vista extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    // --- METODO PARA CAMBIAR LA ESTETICA DEL CURSOR Y EL BOTON ---
+    // METODO-ESTETICO
     private void btnAgregarMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnAgregarMouseEntered
         this.btnAgregar.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         this.btnAgregar.setBackground(Color.GRAY);
     }//GEN-LAST:event_btnAgregarMouseEntered
 
+    // METODO-ESTETICO
     private void btnAgregarMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnAgregarMouseExited
         this.btnAgregar.setBackground(Color.BLACK);
     }//GEN-LAST:event_btnAgregarMouseExited
-    // --- METODO PARA CAMBIAR LA ESTETICA DEL CURSOR Y EL BOTON ---
 
-    //METODO PARA AGREGAR EL ADMIN
+    // METODO PARA AGREGAR EL ADMIN
     private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
         try {
+            
             String correo = this.txtCorreo.getText();
             String contra = this.txtContraseña.getText();
-
-            if (!this.controladorAdmin.correoExistente(correo) && (this.controladorAdmin.comprobarCamposAdmin_C(correo, contra))) {
-                Login_Object admin = new Login_Object(correo, contra);
-                this.controladorAdmin.guardarAdmin_C(admin);
-                this.txtCorreo.setText("");
-                this.txtContraseña.setText("");
-                this.dispose();
-                this.vistaA.cargarDatosTabla("");
-
-            } else {
-                JOptionPane.showMessageDialog(null, "CORREO YA EXISTENTE O ERROR EN ALGUN CAMPO", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
+            
+            if(Validaciones.validarLogin(correo, contra)){
+                
+                this.controladorAdmin.correoExistente(correo).thenAccept(existe -> {
+                
+                    if(!existe){
+                        
+                        Login_Object admin = new Login_Object(correo, contra);
+                        this.controladorAdmin.guardarAdmin_C(admin).thenRun(() -> {
+                            this.vistaA.cargarDatosTabla("");
+                        }).exceptionally(ex -> {
+                            return null;
+                        });
+                        this.txtCorreo.setText("");
+                        this.txtContraseña.setText("");
+                        this.dispose();
+                                                
+                    }else{
+                        JOptionPane.showMessageDialog(null, "CORREO YA EXISTENTE", "AGREGAR ADMINISTRADOR", JOptionPane.INFORMATION_MESSAGE);
+                    }
+                
+                }).exceptionally(ex -> {
+                    return null;
+                });
+                
+            }else{
+                JOptionPane.showMessageDialog(null, "HAS INTRODUCIDO UN DATO ERRONEO", "AGREGAR ADMINISTRADOR", JOptionPane.ERROR_MESSAGE);
             }
 
         } catch (HeadlessException | NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "ERROR EN ALGUN CAMPO", "INFORMACION", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "HAS INTRODUCIDO UN DATO ERRONEO", "AGREGAR ADMINISTRADOR", JOptionPane.ERROR_MESSAGE);
         }
 
     }//GEN-LAST:event_btnAgregarActionPerformed
 
-    //METODO PARA CUANDO SE CIERRA LA VENTANA
+    // METODO PARA CUANDO SE CIERRA LA VENTANA
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
         this.txtCorreo.setText("");
         this.txtContraseña.setText("");
