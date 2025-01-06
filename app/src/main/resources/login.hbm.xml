@@ -12,14 +12,21 @@ Click nbfs://nbhost/SystemFileSystem/Templates/XML/XMLDocument.xml to edit this 
 <hibernate-mapping>
 
     <class name="PackageLogin.Login_Object" table="login">
+        
+        <!-- ID -->
         <id name="id_login" type="int">
-            <column name="id_login" />
+            <column name="id_login" not-null="true" />
             <generator class="native" />
         </id>
 
-        <property column="correo" name="correo" />
-        <property column="contraseña" name="contraseña" />
-        
+        <!-- Propiedades -->
+        <property name="correo" type="string">
+            <column name="correo" not-null="true" unique="true" />
+        </property>
+
+        <property name="contraseña" type="string">
+            <column name="contraseña" not-null="true" />
+        </property>
         
     </class>
 </hibernate-mapping>

@@ -14,19 +14,36 @@ Click nbfs://nbhost/SystemFileSystem/Templates/XML/XMLDocument.xml to edit this 
 <hibernate-mapping>
 
     <class name="PackageEmpleados.Empleados_Object" table="empleados">
+        
+        <!-- ID -->
         <id name="id_empleado" type="int">
-            <column name="id_empleado" />
+            <column name="id_empleado" not-null="true" />
             <generator class="native" />
         </id>
 
-        <property column="dni" name="dni" />
-        <property column="nombre" name="nombre" />
-        <property column="edad" name="edad" />
-        <property column="telefono" name="telefono" />
-        <property column="f_alta" name="f_alta" />
-        
-        <many-to-one name="empresas_id_empresa" class="PackageEmpresas.Empresas_Object" column="empresas_id_empresa" />
-        
+        <!-- Propiedades -->
+        <property name="dni" type="string">
+            <column name="dni" not-null="true" unique="true" />
+        </property>
+
+        <property name="nombre" type="string">
+            <column name="nombre" not-null="true" />
+        </property>
+
+        <property name="edad" type="int">
+            <column name="edad" not-null="true" />
+        </property>
+
+        <property name="telefono" type="int">
+            <column name="telefono" not-null="true" unique="true" />
+        </property>
+
+        <property name="f_alta" type="date">
+            <column name="f_alta" not-null="true" />
+        </property>
+
+        <!-- Relación Muchos a Uno con Empresas -->
+        <many-to-one name="empresas_id_empresa" class="PackageEmpresas.Empresas_Object" column="empresas_id_empresa" not-null="false" />
         
     </class>
 </hibernate-mapping>

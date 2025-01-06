@@ -14,20 +14,40 @@ Click nbfs://nbhost/SystemFileSystem/Templates/XML/XMLDocument.xml to edit this 
 <hibernate-mapping>
 
     <class name="PackageProductos.Productos_Object" table="productos">
+        
+        <!-- ID -->
         <id name="id_producto" type="int">
-            <column name="id_producto" />
+            <column name="id_producto" not-null="true" />
             <generator class="native" />
         </id>
 
-        <property column="identificador" name="identificador" />
-        <property column="nombre" name="nombre" />
-        <property column="precio" name="precio" />
-        <property column="categoria" name="categoria" />
-        <property column="stock" name="stock" />
-        <property column="f_alta" name="f_alta" />
-        
-        <many-to-one name="empresas_id_empresa_p" class="PackageEmpresas.Empresas_Object" column="empresas_id_empresa_p" />
-        
+        <!-- Propiedades -->
+        <property name="identificador" type="string">
+            <column name="identificador" not-null="true" unique="true" />
+        </property>
+
+        <property name="nombre" type="string">
+            <column name="nombre" not-null="true" />
+        </property>
+
+        <property name="precio" type="double">
+            <column name="precio" not-null="true" />
+        </property>
+
+        <property name="categoria" type="string">
+            <column name="categoria" not-null="true" />
+        </property>
+
+        <property name="stock" type="int">
+            <column name="stock" not-null="true" />
+        </property>
+
+        <property name="f_alta" type="date">
+            <column name="f_alta" not-null="true" />
+        </property>
+
+        <!-- Relación Muchos a Uno con Empresas -->
+        <many-to-one name="empresas_id_empresa_p" class="PackageEmpresas.Empresas_Object" column="empresas_id_empresa_p" not-null="false" />
         
     </class>
 </hibernate-mapping>

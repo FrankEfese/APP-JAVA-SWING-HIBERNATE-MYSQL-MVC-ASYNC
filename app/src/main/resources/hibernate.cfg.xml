@@ -7,6 +7,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/XML/XMLDocument.xml to edit this 
 
 <hibernate-configuration>
     <session-factory>
+        
         <!-- Database connection settings -->
         <property name="connection.driver_class">com.mysql.cj.jdbc.Driver</property>
         <property name="connection.url">jdbc:mysql://localhost:3306/proyecto-java</property>
@@ -16,23 +17,15 @@ Click nbfs://nbhost/SystemFileSystem/Templates/XML/XMLDocument.xml to edit this 
         <property name="connection.pool_size">5</property>
         <property name="hibernate.current_session_context_class">thread</property>
         <property name="hibernate.dialect">org.hibernate.dialect.MySQL8Dialect</property>
+        <property name="hibernate.hbm2ddl.auto">update</property>
         <!-- Escaneo de paquetes para clases de entidad -->
-        <property name="hibernate.archive.autodetection">class, hbm</property>
         <property name="hibernate.show_sql">true</property>
         <mapping resource="login.hbm.xml"/>
-        <mapping class="PackageLogin.Login_Object"/>
         <mapping resource="seguros.hbm.xml"/>
-        <mapping class="PackageSeguros.Seguros_Object"/>
-        <mapping resource="empresas.hbm.xml"/>
-        <mapping class="PackageEmpresas.Empresas_Object"/>
-        <mapping resource="empleados.hbm.xml"/>
-        <mapping class="PackageEmpleados.Empleados_Object"/>
+        <mapping resource="empresas.hbm.xml"/>      
+        <mapping resource="empleados.hbm.xml"/>       
         <mapping resource="productos.hbm.xml"/>
-        <mapping class="PackageProductos.Productos_Object"/>
-        
-        
-        
-        
+               
     </session-factory>
 </hibernate-configuration>
 

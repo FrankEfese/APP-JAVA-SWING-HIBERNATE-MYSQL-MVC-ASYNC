@@ -3,41 +3,17 @@ package PackageProductos;
 import PackageEmpresas.Empresas_Object;
 import java.io.Serializable;
 import java.util.Date;
-import javax.persistence.*;
 
-
-@Entity
-@Table(name = "productos")
 public class Productos_Object implements Serializable{
     
     // ATRIBUTOS
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id_producto")
     private int id_producto;
-    
-    @Column(name = "identificador", nullable = false , unique = true)
     private String identificador;
-    
-    @Column(name = "nombre", nullable = false)
     private String nombre;
-    
-    @Column(name = "precio", nullable = false)
     private double precio;
-    
-    @Column(name = "categoria", nullable = false)
     private String categoria;
-    
-    @Column(name = "stock", nullable = false)
     private int stock;
-    
-    @Column(name = "f_alta", nullable = false)
-    @Temporal(javax.persistence.TemporalType.DATE)
     private Date f_alta;
-    
-    // RELACION MUCHOS A 1 CON EMPRESAS
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "empresas_id_empresa_p", nullable = true)
     private Empresas_Object empresas_id_empresa_p;
     
     // CONSTRUCTOR

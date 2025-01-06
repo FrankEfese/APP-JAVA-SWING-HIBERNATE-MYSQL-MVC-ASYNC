@@ -6,34 +6,17 @@ import PackageSeguros.Seguros_Object;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.OneToMany;
 
-@Entity
-@Table(name = "empresas")
 public class Empresas_Object implements Serializable {
 
     // ATRIBUTOS
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id_empresa")
     private int id_empresa;
-
-    @Column(name = "id_empresarial", nullable = false , unique = true)
     private String id_empresarial;
-
-    @Column(name = "nombre", nullable = false)
     private String nombre;
-
-    @Column(name = "ciudad", nullable = false)
     private String ciudad;
-
-    @Column(name = "f_alta", nullable = false)
-    @Temporal(javax.persistence.TemporalType.DATE)
     private Date f_alta;
-
-    // RELACION MUCHOS A 1 CON SEGUROS
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "seguros_id_seguro", nullable = true)
     private Seguros_Object seguros_id_seguro;
     
     // RELACION 1 A MUCHOS CON EMPLEADOS

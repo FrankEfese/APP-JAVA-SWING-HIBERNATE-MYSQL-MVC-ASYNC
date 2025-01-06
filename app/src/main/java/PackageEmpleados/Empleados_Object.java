@@ -3,37 +3,16 @@ package PackageEmpleados;
 import PackageEmpresas.Empresas_Object;
 import java.io.Serializable;
 import java.util.Date;
-import javax.persistence.*;
 
-@Entity
-@Table(name = "empleados")
 public class Empleados_Object implements Serializable {
 
     // ATRIBUTOS
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id_empleado")
     private int id_empleado;
-
-    @Column(name = "dni", nullable = false, unique = true)
     private String dni;
-
-    @Column(name = "nombre", nullable = false)
     private String nombre;
-
-    @Column(name = "edad", nullable = false)
     private int edad;
-
-    @Column(name = "telefono", nullable = false, unique = true)
     private int telefono;
-
-    @Column(name = "f_alta", nullable = false)
-    @Temporal(javax.persistence.TemporalType.DATE)
     private Date f_alta;
-
-    // RELACION MUCHOS A 1 CON EMPRESAS
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "empresas_id_empresa", nullable = true)
     private Empresas_Object empresas_id_empresa;
 
     // CONSTRUCTOR

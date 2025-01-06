@@ -14,18 +14,32 @@ Click nbfs://nbhost/SystemFileSystem/Templates/XML/XMLDocument.xml to edit this 
 <hibernate-mapping>
 
     <class name="PackageEmpresas.Empresas_Object" table="empresas">
+        
+        <!-- ID -->
         <id name="id_empresa" type="int">
-            <column name="id_empresa" />
+            <column name="id_empresa" not-null="true" />
             <generator class="native" />
         </id>
 
-        <property column="id_empresarial" name="id_empresarial" />
-        <property column="nombre" name="nombre" />
-        <property column="ciudad" name="ciudad" />
-        <property column="f_alta" name="f_alta" />
+        <!-- Propiedades -->
+        <property name="id_empresarial" type="string">
+            <column name="id_empresarial" not-null="true" unique="true" />
+        </property>
+
+        <property name="nombre" type="string">
+            <column name="nombre" not-null="true" />
+        </property>
+
+        <property name="ciudad" type="string">
+            <column name="ciudad" not-null="true" />
+        </property>
         
-        <many-to-one name="seguros_id_seguro" class="PackageSeguros.Seguros_Object" column="seguros_id_seguro" />
-        
+        <property name="f_alta" type="date">
+            <column name="f_alta" not-null="true" />
+        </property>
+
+        <!-- Relación Muchos a Uno -->
+        <many-to-one name="seguros_id_seguro" class="PackageSeguros.Seguros_Object" column="seguros_id_seguro" not-null="false" />
         
     </class>
 </hibernate-mapping>

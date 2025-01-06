@@ -4,28 +4,17 @@ import PackageEmpresas.Empresas_Object;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.OneToMany;
 
-@Entity
-@Table(name = "seguros")
 public class Seguros_Object implements Serializable {
 
     // ATRIBUTOS
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id_seguro")
     private int id_seguro;
-
-    @Column(name = "nombre", nullable = false, unique = true)
     private String nombre;
-
-    @Column(name = "precio", nullable = false)
     private double precio;
-
-    @Column(name = "f_alta", nullable = false)
-    @Temporal(javax.persistence.TemporalType.DATE)
     private Date f_alta;
-
+    
     // RELACION 1 A MUCHOS CON EMPRESAS
     @OneToMany(mappedBy = "seguros_id_seguro", cascade = CascadeType.PERSIST)
     private List<Empresas_Object> empresas;

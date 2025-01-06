@@ -1,22 +1,12 @@
 package PackageLogin;
 
 import java.io.Serializable;
-import javax.persistence.*;
 
-@Entity
-@Table(name = "login")
 public class Login_Object implements Serializable {
 
     // ATRIBUTOS
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id_login")
     private int id_login;
-
-    @Column(name = "correo", nullable = false, unique = true)
     private String correo;
-
-    @Column(name = "contraseña", nullable = false)
     private String contraseña;
 
     // CONSTRUCTOR
