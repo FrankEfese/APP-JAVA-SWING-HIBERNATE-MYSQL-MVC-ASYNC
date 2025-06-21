@@ -1,4 +1,4 @@
-# <div align="center"> APP-JAVA - JAVA SWING - HIBERNATE - MYSQL - MVC </div>
+# <div align="center"> APP-JAVA - JAVA SWING - HIBERNATE - MYSQL - MVC - ASYNC</div>
 
 [![HOLA-SOY-FRAN.png](https://i.postimg.cc/1zF33sYY/HOLA-SOY-FRAN.png)](https://postimg.cc/LqHpyKSz)
 
@@ -35,4 +35,12 @@
 [![HOLA-SOY-FRAN.png](https://i.postimg.cc/tCjLwP6c/HOLA-SOY-FRAN.png)](https://postimg.cc/rzfntDQG)
 
 <h4 align="center">The application uses the Model-View-Controller architecture, which will allow for better organization and scalability for future updates.</h4>
+
+<br>
+
+## <div align="center">COMPLETABLE FUTURE</div>
+
+[![Async.png](https://i.postimg.cc/Pxck1KYn/Async.png)](https://postimg.cc/9RGShdLL)
+
+<h4 align="center">This application leverages Java's CompletableFuture class to implement asynchronous operations, allowing intensive tasks such as database interactions to run in the background. This significantly improves the responsiveness of the user interface built with Java Swing by preventing blocking and providing a smoother user experience. Thanks to this asynchronous architecture, the application can handle multiple processes concurrently, optimizing performance without compromising the simplicity of the MVC-based design.</h4>
 
