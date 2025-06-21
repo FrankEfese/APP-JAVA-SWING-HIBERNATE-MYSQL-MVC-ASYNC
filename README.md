@@ -1,4 +1,4 @@
-# <div align="center"> APP-JAVA - JAVA SWING - HIBERNATE - MYSQL - MVC - ASYNC</div>
+# <div align="center"> APP-JAVA - SWING - HIBERNATE - MYSQL - MVC - ASYNC</div>
 
 [![HOLA-SOY-FRAN.png](https://i.postimg.cc/1zF33sYY/HOLA-SOY-FRAN.png)](https://postimg.cc/LqHpyKSz)
 
